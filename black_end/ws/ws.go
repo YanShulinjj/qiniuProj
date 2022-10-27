@@ -1,0 +1,190 @@
+/* ----------------------------------
+*  @author suyame 2022-10-26 20:33:00
+*  Crazy for Golang !!!
+*  IDE: GoLand
+*-----------------------------------*/
+
+package ws
+
+import (
+	"log"
+	"net/http"
+	"sync"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+)
+
+// Manager 所有 websocket 信息
+type Manager struct {
+	ClientMap            map[string]*Client
+	clientCount          uint
+	Lock                 sync.Mutex
+	Register, UnRegister chan *Client
+	BroadCastMessage     chan *BroadCastMessageData
+}
+
+// Client 单个 websocket 信息
+type Client struct {
+	Lock sync.Mutex      // 加一把锁
+	Id   string          // 用户标识
+	Conn *websocket.Conn // 用户连接
+}
+
+// 广播发送数据信息
+type BroadCastMessageData struct {
+	Id      string // 消息的标识符，标识指定用户
+	Message []byte
+}
+
+// 读信息，从 websocket 连接直接读取数据
+func (c *Client) Read(manager *Manager) {
+	defer func() {
+		WebsocketManager.UnRegister <- c
+		log.Printf("client [%s] disconnect", c.Id)
+		if err := c.Conn.Close(); err != nil {
+			log.Printf("client [%s] disconnect err: %s", c.Id, err)
+		}
+	}()
+
+	for {
+		messageType, message, err := c.Conn.ReadMessage()
+		if err != nil || messageType == websocket.CloseMessage {
+			break
+		}
+		log.Printf("client [%s] receive message: %s", c.Id, string(message))
+
+		// 向广播消息写入数据
+		manager.BroadCastMessage <- &BroadCastMessageData{Id: c.Id, Message: message}
+	}
+}
+
+// 向所有客户发送广播数据
+func (m *Manager) WriteToAll() {
+	for {
+		select {
+		case data, ok := <-m.BroadCastMessage:
+			if !ok {
+				log.Println("没有取到广播数据。")
+			}
+			for _, client := range m.ClientMap {
+				sender, flag := m.ClientMap[data.Id]
+
+				// 绘图数据不会发给自己，如果这里是将绘图数据写给客户端，应该跳过正在绘图的人
+				if sender.Id == client.Id {
+					continue
+				}
+
+				if !flag {
+					log.Println("用户不存在") // 这里应该是存在的，先判断一下
+				}
+
+				client.Lock.Lock()
+				client.Conn.WriteMessage(websocket.TextMessage, data.Message)
+				client.Lock.Unlock()
+			}
+
+			log.Println("广播数据：", data.Message)
+		}
+	}
+}
+
+// 启动 websocket 管理器
+func (manager *Manager) Start() {
+	log.Printf("websocket manage start")
+	for {
+		select {
+		// 注册
+		case client := <-manager.Register:
+			log.Printf("client [%s] connect", client.Id)
+			log.Printf("register client [%s]", client.Id)
+
+			manager.Lock.Lock()
+			manager.ClientMap[client.Id] = client
+			manager.clientCount += 1
+			manager.Lock.Unlock()
+
+		// 注销
+		case client := <-manager.UnRegister:
+			log.Printf("unregister client [%s]", client.Id)
+			manager.Lock.Lock()
+
+			if _, ok := manager.ClientMap[client.Id]; ok {
+				delete(manager.ClientMap, client.Id)
+				manager.clientCount -= 1
+			}
+
+			manager.Lock.Unlock()
+		}
+	}
+}
+
+// 注册
+func (manager *Manager) RegisterClient(client *Client) {
+	manager.Register <- client
+}
+
+// 注销
+func (manager *Manager) UnRegisterClient(client *Client) {
+	manager.UnRegister <- client
+}
+
+// 当前连接个数
+func (manager *Manager) LenClient() uint {
+	return manager.clientCount
+}
+
+// 获取 wsManager 管理器信息
+func (manager *Manager) Info() map[string]interface{} {
+	managerInfo := make(map[string]interface{})
+	managerInfo["clientLen"] = manager.LenClient()
+	managerInfo["chanRegisterLen"] = len(manager.Register)
+	managerInfo["chanUnregisterLen"] = len(manager.UnRegister)
+	managerInfo["chanBroadCastMessageLen"] = len(manager.BroadCastMessage)
+	return managerInfo
+}
+
+// 初始化 wsManager 管理器
+var WebsocketManager = Manager{
+	ClientMap:        make(map[string]*Client),
+	Register:         make(chan *Client, 128),
+	UnRegister:       make(chan *Client, 128),
+	BroadCastMessage: make(chan *BroadCastMessageData, 128),
+	clientCount:      0,
+}
+
+// gin 处理 websocket handler
+func (manager *Manager) WsClient(ctx *gin.Context) { // 参数为 ctx *gin.Context 的即为 gin的路由绑定函数
+	upGrader := websocket.Upgrader{
+		// cross origin domain
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+		// 处理 Sec-WebSocket-Protocol Header
+		Subprotocols: []string{ctx.GetHeader("Sec-WebSocket-Protocol")},
+	}
+
+	// 生成uuid，作为sessionid
+	// id := strings.ToUpper(strings.Join(strings.Split(uuid.NewV4().String(), "-"), ""))
+	id := ctx.Request.RemoteAddr
+	// 设置http头部，添加sessionid
+	heq := make(http.Header)
+	heq.Set("sessionid", id)
+
+	// 建立一个websocket的连接
+	conn, err := upGrader.Upgrade(ctx.Writer, ctx.Request, heq)
+	if err != nil {
+		log.Printf("websocket connect error: %s", id)
+		return
+	}
+
+	// 创建一个client对象（包装websocket连接）
+	client := &Client{
+		Id:   id,
+		Conn: conn,
+	}
+
+	manager.RegisterClient(client) // 将client对象添加到管理器中
+	go client.Read(manager)        // 从一个客户端读取数据
+	go manager.WriteToAll()        // 将数据写入所有客户端
+}
