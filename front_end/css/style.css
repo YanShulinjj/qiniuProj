@@ -1,0 +1,407 @@
+/* ------------------------------上面是字体图标--------------------------------- */
+body , html{
+    width: 100%;
+    height: 100%;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+
+    moz-user-select: -moz-none;
+    -moz-user-select: none;
+    -o-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+
+}
+.svgContainer{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    position: relative;
+}
+.svgparent {
+    width: 100%;
+    height: 100%;
+}
+.toolContainer{
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    height: 450px;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.tool-rangeBox {
+    position: relative;
+    width: 140px;
+}
+.toolbar {
+    border-radius: 0px 30px 30px 0;
+    width: 70px;
+    height: 450px;
+    border: 2px solid rgb(255, 255, 255);
+    box-shadow:  0px 1px 9px 0px rgba(90, 90, 90, 0.308);
+    background-color: rgb(94 170 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.toolbar > label {      /*字体图标*/
+    text-align: center;
+    line-height: 45px;
+    width: 60px;
+    height: 50px;
+    border: solid 2px rgb(94 170 255);
+    border-radius: 20px;
+    font-size: 25px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(94 170 255);
+    box-shadow:0px 0px 0px 0px #00000000;
+    transition: 0.4s ease;
+}
+.toolbar > label:hover {
+    transition: 0.4s ease;
+    border: solid 2px rgb(255, 255, 255);
+}
+
+.tool-rangeBox  input[id="icon-qiniu-huabi"]:checked ~ .toolbar label.icon-qiniu-huabi {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+
+}
+.tool-rangeBox  input[id="icon-qiniu-line"]:checked ~ .toolbar label.icon-qiniu-line {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+
+}
+.tool-rangeBox  input[id="icon-wubianxing"]:checked ~ .toolbar label.icon-wubianxing {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+
+}
+.tool-rangeBox  input[id="icon-qiniu-ellipse"]:checked ~ .toolbar label.icon-qiniu-ellipse {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+
+}
+.tool-rangeBox  input[id="icon-qiniu-square"]:checked ~ .toolbar label.icon-qiniu-square {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+}
+.tool-rangeBox  input[id="icon-qiniu-rectangle"]:checked ~ .toolbar label.icon-qiniu-rectangle {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+}
+.tool-rangeBox  input[id="icon-qiniu-text"]:checked ~ .toolbar label.icon-qiniu-text {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+}
+.tool-rangeBox  input[id="icon-qiniu-eraser"]:checked ~ .toolbar label.icon-qiniu-eraser {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+}
+
+
+.tool-rangeBox  input[name="toolselect"] {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+
+}
+.add-undo-rangeBox {
+    position: absolute;
+    left: 50%;
+    bottom: 0px;
+}
+
+.add-undo-rangeBox  input[id="icon-qiniu-add"]:checked ~ .addundobar label.icon-qiniu-add {
+    transition: 0.4s ease;
+    background-color: #fff;
+    width: 75px;
+    color: #3496f8;
+    box-shadow:3px 1px 5px 0px #6988e17a;
+}
+.addundobar {
+    width: 160px;
+    height: 60px;
+    left: 50%;
+    border: 2px solid rgb(255, 255, 255);
+    border-radius: 20px 20px 20px 20px;
+    box-shadow:  0px 1px 9px 0px rgba(90, 90, 90, 0.308);
+    background-color: rgb(94 170 255);
+    display: flex;
+    position: absolute;
+    bottom: 20px;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    transform: translateX(-50%);
+}
+.addundobar > label {      /*字体图标*/
+    text-align: center;
+    line-height: 45px;
+    width: 60px;
+    height: 50px;
+    border: solid 2px rgb(94 170 255);
+    border-radius: 20px;
+    font-size: 25px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(94 170 255);
+    box-shadow:0px 0px 0px 0px #00000000;
+    transition: 0.4s ease;
+}
+.addundobar > label > button {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+.addundobar > label:hover {
+    transition: 0.4s ease;
+    border: solid 2px rgb(255, 255, 255);
+}
+
+.add-undo-rangeBox  input[name="toolselect"] {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+
+}
+
+
+/*  背景色和FIll*/
+label.back-bgc, label.forth-bgc {
+    position: absolute;
+    display: inline-block;
+    width: 35px;
+    height:35px;
+    border-radius: 10px;
+    box-shadow:2px 3px 3px 0px rgb(0 0 0 / 12%) ;
+}
+label.back-bgc {
+    top: 385px;
+    left: 88px;
+    background-color: rgb(97, 100, 250);
+}
+label.forth-bgc {
+    top: 402px;
+    left: 102px;
+    background-color: rgb(255, 156, 206);
+}
+label.fill {
+    color: rgb(214, 214, 214);
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: 340px;
+    left:94px;
+    border-radius: 12px;
+    box-shadow: 0 0 0 0 rgba(17, 4, 4, 0);
+    border:solid 2px rgb(93, 93, 93);
+    transform: translateY(0px);
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.tool-rangeBox input[id="fillstart-input"]:checked ~ label.fill{
+    transition: 0.3s ease;
+    transform: translateY(-4px);
+    border:solid 1px rgb(255, 255, 255);
+    box-shadow: 0px 5px 5px 0 #00440933;
+}
+
+.tool-rangeBox .fillstart {
+    position: absolute;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 6px;
+    width: 35px;
+    height: 20px;
+    background-color: rgb(95, 95, 95);
+    color: rgb(216, 216, 216);
+    top: 383px;
+    left: 94px;
+    font-size: 12px;
+    transition: 0.4s ease;
+    cursor: pointer;
+}
+
+.tool-rangeBox input[id="fillstart-input"]:checked ~  .fillstart {
+    background-color: rgb(74, 238, 115);
+    color:#333;
+}
+/* .tool-rangeBox #fill {
+    visibility: hidden;
+
+} */
+
+.tool-rangeBox > label  input[type="color"],.tool-rangeBox input[id="fillstart-input"] {    /*背景色*/
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+}
+
+
+/* 笔画大小 滑条*/
+em {
+    position: absolute;
+    top: 24px;
+    left: 97px;
+    width:30px;
+    height: 30px;
+    color: rgb(130, 121, 253);
+    font-weight: bolder;
+    border-radius: 999px;
+    font-style:normal;
+    font-size: 18px;
+    text-align: center;
+    line-height: 30px;
+    background-color:rgb(213, 228, 255);
+    opacity: 0;
+    transition: 2s ease;
+}
+.range:hover + em{
+    transition: 0.3s ease;
+    opacity: 1;
+}
+.range{
+    display: inline-block;
+    transform:rotate(-90deg) translate(274px, -17px);
+}
+.range > input[type="range"] {
+    -webkit-appearance: none; /*去除默认样式*/
+    background-color: rgb(193, 222, 255);
+    width: 250px ;
+    height:4px;
+    padding: 0;
+    border: none;
+    box-shadow: -8px 3px 7px 0px rgb(0 0 0 / 12%);
+}
+.range > input[type=range]::-webkit-slider-thumb  {
+    -webkit-appearance: none;/*去除默认样式*/
+    cursor: default;
+    top: 0;
+    height: 20px;
+    width: 20px;
+    transform: translateY(0px);
+    /*background: none repeat scroll 0 0 #5891f5;*/
+    background: #fff;
+    border-radius: 15px;
+    border: 5px solid #006eb3;
+    /*-webkit-box-shadow: 0 -1px 1px #fc7701 inset;*/
+}
+
+
+
+
+/* ------------------------右边的颜色选择------------------------ */
+.colorContainer{
+    margin-right: 40px;
+    width: 40px;
+    height: 100%;
+}
+.colors {
+    display: block;
+    width: 45px;
+    height: 45px;
+    border-radius: 999px;
+    border: 1px solid rgb(216, 216, 216);
+    transition: 0.4s ease;
+}
+#color{
+    opacity: 0;
+}
+.colorSelect {
+    margin-top: 15px;
+    width: 45px;
+    height:85%;
+    background-color: rgb(166, 159, 255);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    overflow: hidden;
+    box-shadow: 0px 1px 9px 0px rgba(99, 133, 95, 0.26);
+    cursor: pointer;
+}
+.colorSelect > li {
+    flex:auto;
+    background-color: rgb(125, 213, 248);
+}
+.colorSelect > li:not(li:nth-of-type(1)) {
+    border-top: 2px rgb(255, 255, 255) solid;
+}
+
+/*保存和打开*/
+div.save-open-clear {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+}
+div.save-open-clear .save, div.save-open-clear .open, div.save-open-clear .clear {
+    text-align: center;
+    line-height: 40px;
+    width: 80px;
+    height: 40px;
+    border-width: 0px;
+    border-radius: 999px; /* 边框半径 */
+    box-shadow: 0px 0px 0px 0px #0000;
+    background: #3496f8; /* 背景颜色 */
+    cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+    outline: none;
+    color: white; /* 字体颜色 */
+    font-size: 16px; /* 字体大小 */
+    transition: 0.4s ease;
+}
+div.save-open-clear .clear {
+    background-color: rgb(255, 85, 85);
+}
+div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-clear .clear:hover {
+    transition: 0.4s ease;
+    transform:translateY(4px);
+    box-shadow: 0px 2px 6px 0px rgba(20, 50, 116, 0.397);
+}
+/* 添加和撤销*/
+div.add-undo {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+}

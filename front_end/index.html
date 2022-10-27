@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>画图</title>
     <link rel="stylesheet" href="./paintboardPro-font/iconfont.css">
-    <style>   
+    <style>
    
 /* ------------------------------上面是字体图标--------------------------------- */
-    
+
         body , html{
             width: 100%;
             height: 100%;
@@ -88,7 +88,7 @@
             width: 75px;
             color: #3496f8;
             box-shadow:3px 1px 5px 0px #6988e17a;
-            
+
         }
         .tool-rangeBox  input[id="icon-qiniu-line"]:checked ~ .toolbar label.icon-qiniu-line {
             transition: 0.4s ease;
@@ -96,7 +96,7 @@
             width: 75px;
             color: #3496f8;
             box-shadow:3px 1px 5px 0px #6988e17a;
-            
+
         }
         .tool-rangeBox  input[id="icon-wubianxing"]:checked ~ .toolbar label.icon-wubianxing {
             transition: 0.4s ease;
@@ -104,7 +104,7 @@
             width: 75px;
             color: #3496f8;
             box-shadow:3px 1px 5px 0px #6988e17a;
-            
+
         }
         .tool-rangeBox  input[id="icon-qiniu-ellipse"]:checked ~ .toolbar label.icon-qiniu-ellipse {
             transition: 0.4s ease;
@@ -112,7 +112,7 @@
             width: 75px;
             color: #3496f8;
             box-shadow:3px 1px 5px 0px #6988e17a;
-            
+
         }
         .tool-rangeBox  input[id="icon-qiniu-square"]:checked ~ .toolbar label.icon-qiniu-square {
             transition: 0.4s ease;
@@ -148,7 +148,7 @@
             visibility: hidden;
             position: absolute;
             top: 0;
-            
+
         }
         .add-undo-rangeBox {
             position: absolute;
@@ -243,7 +243,7 @@
             transition: 0.3s ease;
             cursor: pointer;
         }
-        
+
         .tool-rangeBox input[id="fillstart-input"]:checked ~ label.fill{
             transition: 0.3s ease;
             transform: translateY(-4px);
@@ -266,7 +266,7 @@
             transition: 0.4s ease;
             cursor: pointer;
         }
-        
+
         .tool-rangeBox input[id="fillstart-input"]:checked ~  .fillstart {
             background-color: rgb(74, 238, 115);
             color:#333;
@@ -275,7 +275,7 @@
             visibility: hidden;
 
         } */
-        
+
         .tool-rangeBox > label  input[type="color"],.tool-rangeBox input[id="fillstart-input"] {    /*背景色*/
             visibility: hidden;
             position: absolute;
@@ -315,7 +315,7 @@
             width: 250px ;
             height:4px;
             padding: 0;
-            border: none;    
+            border: none;
             box-shadow: -8px 3px 7px 0px rgb(0 0 0 / 12%);
         }
         .range > input[type=range]::-webkit-slider-thumb  {
@@ -331,7 +331,7 @@
               border: 5px solid #006eb3;
               /*-webkit-box-shadow: 0 -1px 1px #fc7701 inset;*/
         }
-       
+
 
 
 
@@ -505,7 +505,7 @@
 </body>
 </html>
 <script>
-    
+
     let svgContainer = document.querySelector('div.svgContainer')
     let svg = document.querySelector('.svg')
     let svgparent = document.querySelector('.svgparent')
@@ -521,7 +521,7 @@
     // 下面这块是右边工具的变量名
     let colorSelectUl = document.querySelector('.colorSelect') // 右边那一条的颜色框
     let colorSelectLis = colorSelectUl.children     /// 这个是颜色框里面的每一个颜色
-    let laberColors = document.querySelector('label.colors')      // input 外面的label 
+    let laberColors = document.querySelector('label.colors')      // input 外面的label
     let colorInput = document.querySelector('input[id="color"]')  // input颜色选择器
     let widthInput = document.querySelector('input[type="range"]')  //笔画粗细
 
@@ -544,7 +544,7 @@
     let openFile = document.querySelector('.open')
     let fileInput = document.querySelector('#fileInput')
     let clear = document.querySelector('.clear')
-    let = drawandnosave = false   // 没有修改过画面。为true  // 用来判断是否需要保存
+    let drawandnosave = false   // 没有修改过画面。为true  // 用来判断是否需要保存
     let isDrawPolygon = false  // 定义当前是否有多边形正在画
 
     svgContainer.addEventListener('mousedown', (e) => {
@@ -560,16 +560,16 @@
             svgContainer.addEventListener('mouseup' ,(colosE) => {
                 laberColors.style.backgroundColor = colorInput.value
             })
-            
+
         }
-        
+
         // 下面是改变滑动条的数字显示
         if (range.contains(e.target)) {     // 修改滑动条的那个文字
             svgContainer.addEventListener('mousemove', function rangeE () {
                 rangeText.textContent = range.lastElementChild.value
             })
         }
-        
+
         // 下面是点击右边几个默认颜色，上面的input颜色选择器也跟改，并且svg画图颜色也更改
         if (colorSelectUl.contains(e.target)) {
             if (colorSelectLis[0].contains(e.target)) {
@@ -606,7 +606,7 @@
             }
 
         }
-        
+
         // 下面这个判断的意思是，是中间那块大的toolContainer 但不是两边小的工具容器和颜色容易，就是两边两块工具, 所有工具实现都在这个if里面
         if ( (svg.contains(e.target) || toolContainer.contains(e.target))   && !(colorContainer.contains(e.target) || (toolRangeBox.contains(e.target)))){
 
@@ -624,7 +624,7 @@
                 }else if (eraser.checked) {
                     polyline.setAttribute('stroke', '#ffffff')
                 }
-                
+
                 polyline.setAttribute('stroke-width', widthInput.value)
                 polyline.setAttribute('stroke-linecap', 'round')
                 polyline.setAttribute('stroke-linejoin', 'round')
@@ -646,7 +646,7 @@
                     polyline.setAttribute('points', points)
                 }
 
-                svgContainer.addEventListener('mousemove', drawDot)  
+                svgContainer.addEventListener('mousemove', drawDot)
 
                 svgContainer.addEventListener('mouseup',  (once) => {
                     svgContainer.removeEventListener('mouseup', once)
@@ -705,14 +705,14 @@
                 }else {
                     rect.setAttribute('fill', 'none')
                 }
-                
+
                 function drawRect () {
                     let rectMovePos = mousePos(svg)
-                    
+
                     let x = rectStartPos.x
                     let y = rectStartPos.y
                     let rx,ry
-                    // 右下角往左上角画矩形 
+                    // 右下角往左上角画矩形
 
                     if (rectMovePos.x < rectStartPos.x) {
                         x = rectMovePos.x
@@ -741,7 +741,7 @@
                     rect.setAttribute('y', y)
                     rect.setAttribute('rx', rx)
                     rect.setAttribute('ry', ry)
-                    
+
                 }
                 svgContainer.addEventListener('mousemove', drawRect)
 
@@ -773,22 +773,22 @@
 
                 function drawLinear () {
                     let linearMoverPos = mousePos(svg)
-                    
+
                     linear.setAttribute('x2', linearStartPos.x + (linearMoverPos.x - linearStartPos.x)) // 鼠标初始位置加上终点位置减去起始位置
                     linear.setAttribute('y2', linearStartPos.y + (linearMoverPos.y - linearStartPos.y))
                 }
                 svgContainer.addEventListener('mousemove', drawLinear)
 
                 svgContainer.addEventListener('mouseup', (linerE) => {
-                    svgContainer.removeEventListener('mouseup', linerE) 
+                    svgContainer.removeEventListener('mouseup', linerE)
                     svgContainer.removeEventListener('mousemove', drawLinear)
                 })
             }
 
-           
+
         }
     })
-    
+
     // 清除所画内容
     clear.addEventListener('click', (clickE) => {
         svg.innerHTML = ''
@@ -807,7 +807,7 @@
     fileInput.addEventListener('change', e => {
       var svgFile = fileInput.files[0]
       var fr = new FileReader()
-      
+
       fr.addEventListener('load', () => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
@@ -829,7 +829,7 @@
     //     return e.returnValue = '还未保存，是否要退出?'
     //   }
     // })
-    
+
     // 将图画保存到桌面
     saveFile.addEventListener('click' ,function save(){
         drawandnosave = false
