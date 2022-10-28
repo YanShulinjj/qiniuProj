@@ -23,6 +23,7 @@ let circle = document.querySelector('#icon-qiniu-ellipse')
 let rect = document.querySelector('#icon-qiniu-rectangle')
 let eraser = document.querySelector('#icon-qiniu-eraser')
 let roundrect = document.querySelector('#icon-qiniu-square')
+let textedit = document.querySelector('#icon-qiniu-text')
 
 
 //按钮
@@ -36,6 +37,7 @@ let hidden = document.querySelector('.hidden')
 let drawandnosave = false   // 没有修改过画面。为true  // 用来判断是否需要保存
 let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
+let mousedownonelement = false
 
 svgContainer.addEventListener('mousedown', (e) => {
     //背景色改变
@@ -104,7 +106,6 @@ svgContainer.addEventListener('mousedown', (e) => {
 
         // 这个是画笔工具 或者 橡皮擦工具
         if (pen.checked || eraser.checked) {
-            console.log(1)
             let penStartPos = mousePos(svg)   // 拿到鼠标开始画的位置
             let polyline = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
             // 添加一堆Attribute
@@ -274,6 +275,14 @@ svgContainer.addEventListener('mousedown', (e) => {
             })
         }
         // TODO: 文本
+        if (textedit.checked) {
+            var localpoint = window.getlocalmousecoord(svg, e);
+            if (!mousedownonelement) {
+                createtext(localpoint, svg);
+            } else {
+                mousedownonelement = false;
+            }
+        }
 
 
 
