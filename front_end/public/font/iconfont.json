@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5809231",
+      "name": "隐藏",
+      "font_class": "qiniu-hidden",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
+      "icon_id": "577357",
+      "name": "删除",
+      "font_class": "qiniu-clear",
+      "unicode": "e74b",
+      "unicode_decimal": 59211
+    },
+    {
+      "icon_id": "4512075",
+      "name": "打开文件",
+      "font_class": "qiniu-open",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "6744056",
+      "name": "保存/下载",
+      "font_class": "qiniu-save",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "1282",
+      "name": "列表",
+      "font_class": "qiniu-list",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
       "icon_id": "14718738",
       "name": "tx-正方形",
       "font_class": "qiniu-square",

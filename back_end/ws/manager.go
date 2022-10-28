@@ -7,15 +7,14 @@
 package ws
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"sync"
-
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
-// Manager 所有 websocket 信息
+// Manager 管理所有websocket 信息
 type Manager struct {
 	ClientMap            map[string]*Client
 	clientCount          uint
@@ -24,39 +23,10 @@ type Manager struct {
 	BroadCastMessage     chan *BroadCastMessageData
 }
 
-// Client 单个 websocket 信息
-type Client struct {
-	Lock sync.Mutex      // 加一把锁
-	Id   string          // 用户标识
-	Conn *websocket.Conn // 用户连接
-}
-
 // 广播发送数据信息
 type BroadCastMessageData struct {
 	Id      string // 消息的标识符，标识指定用户
 	Message []byte
-}
-
-// 读信息，从 websocket 连接直接读取数据
-func (c *Client) Read(manager *Manager) {
-	defer func() {
-		WebsocketManager.UnRegister <- c
-		log.Printf("client [%s] disconnect", c.Id)
-		if err := c.Conn.Close(); err != nil {
-			log.Printf("client [%s] disconnect err: %s", c.Id, err)
-		}
-	}()
-
-	for {
-		messageType, message, err := c.Conn.ReadMessage()
-		if err != nil || messageType == websocket.CloseMessage {
-			break
-		}
-		log.Printf("client [%s] receive message: %s", c.Id, string(message))
-
-		// 向广播消息写入数据
-		manager.BroadCastMessage <- &BroadCastMessageData{Id: c.Id, Message: message}
-	}
 }
 
 // 向所有客户发送广播数据
@@ -68,20 +38,20 @@ func (m *Manager) WriteToAll() {
 				log.Println("没有取到广播数据。")
 			}
 			for _, client := range m.ClientMap {
-				sender, flag := m.ClientMap[data.Id]
+				sender, ok := m.ClientMap[data.Id]
 
 				// 绘图数据不会发给自己，如果这里是将绘图数据写给客户端，应该跳过正在绘图的人
 				if sender.Id == client.Id {
 					continue
 				}
 
-				if !flag {
+				if !ok {
 					log.Println("用户不存在") // 这里应该是存在的，先判断一下
 				}
 
-				client.Lock.Lock()
+				client.Lock()
 				client.Conn.WriteMessage(websocket.TextMessage, data.Message)
-				client.Lock.Unlock()
+				client.Unlock()
 			}
 
 			log.Println("广播数据：", data.Message)
