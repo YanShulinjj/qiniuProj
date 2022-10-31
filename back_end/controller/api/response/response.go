@@ -6,7 +6,7 @@
 
 package response
 
-import "ws/pkg/xerr"
+import "qiniu/pkg/xerr"
 
 type Status struct {
 	Code    xerr.ErrCodeType `json:"status_code"`

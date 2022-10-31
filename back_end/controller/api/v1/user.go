@@ -9,9 +9,9 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"ws/controller/api/response"
-	"ws/pkg/xerr"
-	"ws/service"
+	"qiniu/controller/api/response"
+	"qiniu/pkg/xerr"
+	"qiniu/service"
 )
 
 type userController struct{}

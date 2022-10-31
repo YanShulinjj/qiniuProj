@@ -7,8 +7,8 @@
 package service
 
 import (
+	"qiniu/dao"
 	"sync"
-	"ws/dao"
 )
 
 type userService struct{}

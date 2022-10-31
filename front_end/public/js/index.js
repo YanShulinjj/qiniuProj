@@ -29,6 +29,7 @@ let textedit = document.querySelector('#icon-qiniu-text')
 //按钮
 let addPage = document.querySelector('.add')
 let undo = document.querySelector('.undo')
+// let redo = document.querySelector('.redo')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -42,6 +43,25 @@ let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
 let ispagelist = false     // 定义是否点击了pagelist
 let mousedownonelement = false
+
+
+// type 编号
+const PolylineType = 0
+const DotType = 1
+const LineType = 2
+const CircleType = 3
+const RoundRectangleType = 4
+const RetangleType = 5
+const TextType = 6
+const UndoType = 7
+const RedoType = 8
+const ClearType = 9
+
+// 记录各种图形的id
+let polylineNum = 1
+let ellipseNum = 1
+let rectangleNum = 1
+let lineNum = 1
 
 svgContainer.addEventListener('mousedown', (e) => {
     //背景色改变
@@ -113,6 +133,8 @@ svgContainer.addEventListener('mousedown', (e) => {
             let penStartPos = mousePos(svg)   // 拿到鼠标开始画的位置
             let polyline = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
             // 添加一堆Attribute
+            polyline.setAttribute("id", polylineNum)
+            polylineNum ++
             if (pen.checked){
                 // 当笔选中时
                 polyline.setAttribute('stroke', colorInput.value)
@@ -134,14 +156,38 @@ svgContainer.addEventListener('mousedown', (e) => {
 
             svg.append(polyline)
             console.log(2)
+
             let points = `${penStartPos.x} ${penStartPos.y} `   // 鼠标坐标
             polyline.setAttribute('points', points)   // 位置属性
 
+            // 多人协作
+            let msg = {
+                type: PolylineType,
+                Attr: {
+                    id: polyline.getAttribute('id'),
+                    points: polyline.getAttribute('points'),
+                    color: polyline.getAttribute('stroke'),
+                    stroke_width: polyline.getAttribute('stroke-width'),
+                    fillValue: polyline.getAttribute('fill')
+                }
+            }
+            client.send(JSON.stringify(msg))
+
+
             function drawDot(e) {   // 鼠标持续移动，持续触发这函数，持续画线
                 let penMovePos = mousePos(svg)
-                let line = document.createElementNS("http://www.w3.org/2000/svg", 'line')
+                // let line = document.createElementNS("http://www.w3.org/2000/svg", 'line')
                 points += `${penMovePos.x} ${penMovePos.y} `
                 polyline.setAttribute('points', points)
+                // 多人协作
+                let msg = {
+                    type: DotType,
+                    Attr: {
+                        id: polyline.getAttribute('id'),
+                        appendPoint: `${penMovePos.x} ${penMovePos.y} `
+                    }
+                }
+                client.send(JSON.stringify(msg))
             }
 
             svgContainer.addEventListener('mousemove', drawDot)
@@ -159,6 +205,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             // 然后加一堆属性
             ellipse.setAttribute('stroke', colorInput.value)
             ellipse.setAttribute('stroke-width', widthInput.value)
+            ellipse.setAttribute('id', 'ellipse_' + ellipseNum)
             if (fillStart.checked){
                 ellipse.setAttribute('fill', fillColor.value)
             }else {
@@ -166,6 +213,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
 
             let startPos = mousePos(svg)   // 获取鼠标相对svg的位置
+
 
             function drawEllipse() {
                 let currPos = mousePos(svg)
@@ -177,8 +225,23 @@ svgContainer.addEventListener('mousedown', (e) => {
                 let ry = Math.abs(startPos.y - currPos.y) / 2
                 ellipse.setAttribute('rx', rx)
                 ellipse.setAttribute('ry', ry)
+                // 多人协作
+                let msg = {
+                    type: CircleType,
+                    Attr: {
+                        id: ellipseNum,
+                        cx: cx,
+                        cy: cy,
+                        rx: rx,
+                        ry: ry,
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        fillValue: ellipse.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
             }
-
+            ellipseNum ++
             document.addEventListener('mousemove', drawEllipse)   // 持续运行
 
             document.addEventListener('mouseup', function once() {  // 解绑
@@ -193,6 +256,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             svg.append(rect)
             let rectStartPos = mousePos(svg)   // 鼠标位置
 
+            rect.setAttribute('id', 'rect_'+rectangleNum)
             rect.setAttribute('stroke', colorInput.value)
             rect.setAttribute('stroke-width', widthInput.value)
             rect.setAttribute('x', rectStartPos.x)
@@ -237,7 +301,26 @@ svgContainer.addEventListener('mousedown', (e) => {
                 rect.setAttribute('rx', rx)
                 rect.setAttribute('ry', ry)
 
+                // 多人协作
+                let msg = {
+                    type: RetangleType,
+                    Attr: {
+                        id: rectangleNum,
+                        x: x,
+                        y: y,
+                        rx: rx,
+                        ry: ry,
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        width: width,
+                        height: height,
+                        fillValue: rect.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
+
             }
+            rectangleNum ++
             svgContainer.addEventListener('mousemove', drawRect)
 
             svgContainer.addEventListener('mouseup', (rectE) => {
@@ -250,7 +333,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             let linear = document.createElementNS("http://www.w3.org/2000/svg", 'line')
             svg.append(linear)
             let linearStartPos = mousePos(svg)
-
+            linear.setAttribute('id', 'line_'+lineNum)
             linear.setAttribute('stroke', colorInput.value)
             linear.setAttribute('stroke-width', widthInput.value)
             linear.setAttribute('stroke-linecap', 'round')
@@ -270,7 +353,25 @@ svgContainer.addEventListener('mousedown', (e) => {
 
                 linear.setAttribute('x2', linearStartPos.x + (linearMoverPos.x - linearStartPos.x)) // 鼠标初始位置加上终点位置减去起始位置
                 linear.setAttribute('y2', linearStartPos.y + (linearMoverPos.y - linearStartPos.y))
+
+                // 多人协作
+                let msg = {
+                    type: LineType,
+                    Attr: {
+                        id: lineNum,
+                        x1: linear.getAttribute('x1'),
+                        y1: linear.getAttribute('y1'),
+                        x2: linear.getAttribute('x2'),
+                        y2: linear.getAttribute('y2'),
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        fillValue: linear.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
+
             }
+            lineNum++
             svgContainer.addEventListener('mousemove', drawLinear)
 
             svgContainer.addEventListener('mouseup', (linerE) => {
@@ -288,11 +389,8 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
         }
 
-
-
     }
 })
-
 
 
 // 点击显示pagelist
@@ -329,6 +427,11 @@ pagelist.addEventListener('click', (e) => {
 // 清除所画内容
 clear.addEventListener('click', (clickE) => {
     svg.innerHTML = ''
+    // 多人协作
+    let msg = {
+        type: ClearType,
+    }
+    client.send(JSON.stringify(msg))
 })
 // 打开一个新文件
 openFile.addEventListener('click', function openLoaclFile () {
@@ -357,7 +460,13 @@ fileInput.addEventListener('change', e => {
 // 撤销
 document.addEventListener("keydown", function (event) {
     if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
-        if (svg.lastChild) svg.lastChild.remove()
+        if (svg.lastChild) {
+            svg.lastChild.remove()
+            let msg = {
+                type: UndoType,
+            }
+            client.send(JSON.stringify(msg))
+        }
     }
 })
 
@@ -389,10 +498,20 @@ addPage.addEventListener("click", function add(){
 
 // 撤销上一步
 undo.addEventListener("click", function (e) {
-    if (svg.lastChild) svg.lastChild.remove()
+    if (svg.lastChild) {
+        svg.lastChild.remove()
+        let msg = {
+            type: UndoType,
+        }
+        client.send(JSON.stringify(msg))
+    }
 })
 
 // TODO redo
+// redo.addEventListener("click", function (e) {
+//    //
+// })
+
 
 // 鼠标相对于元素的位置
 function mousePos(node) {

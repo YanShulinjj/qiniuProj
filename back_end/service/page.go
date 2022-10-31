@@ -7,9 +7,9 @@
 package service
 
 import (
+	"qiniu/dao"
+	"qiniu/pkg/svg"
 	"sync"
-	"ws/dao"
-	"ws/pkg/svg"
 )
 
 type pageService struct{}

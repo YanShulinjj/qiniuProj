@@ -11,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
-	"ws/config"
-	"ws/controller/api/response"
-	"ws/pkg/xerr"
-	"ws/service"
+	"qiniu/config"
+	"qiniu/controller/api/response"
+	"qiniu/pkg/xerr"
+	"qiniu/service"
 )
 
 type pageController struct{}

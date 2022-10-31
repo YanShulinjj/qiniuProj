@@ -9,8 +9,8 @@ package dao
 import (
 	"context"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"ws/config"
-	"ws/model"
+	"qiniu/config"
+	"qiniu/model"
 )
 
 type ServiceContext struct {

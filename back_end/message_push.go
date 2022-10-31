@@ -9,7 +9,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"ws/ws"
+	"qiniu/ws"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +34,7 @@ func main() {
 		wsGroup.GET("/wedraw", ws.WebsocketManager.WsClient) // 每一个访问都会调用该路由对应的方法
 	}
 
-	bindAddress := ":8080"
+	bindAddress := ":9999"
 	r.Run(bindAddress)
 }
 

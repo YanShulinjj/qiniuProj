@@ -8,9 +8,9 @@ package dao
 
 import (
 	"github.com/pkg/errors"
+	"qiniu/model"
+	xerr2 "qiniu/pkg/xerr"
 	"sync"
-	"ws/model"
-	xerr2 "ws/pkg/xerr"
 )
 
 type pageDAO struct{}
