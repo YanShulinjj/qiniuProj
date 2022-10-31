@@ -30,17 +30,23 @@ window.getlocalmousecoord = function (svg, evt) {
 
 window.createtext = function (localpoint, svg) {
     let text = document.createElementNS("http://www.w3.org/2000/svg", 'text')   // 创建圆的标签
-    svg.append(text)  // 插入svg
+
     // 然后加一堆属性
-    msg=confirm("你有没有学过h5？");// 同步等待：1
-    name=prompt("请输入你的姓名：");//弹出框执行的优先级别要高于返回值：2
-    console.log(name);//4
+    content=prompt("请输入文本：");//弹出框执行的优先级别要高于返回值：2
+    console.log(content);//4
+    // 如果取消 直接返回
+    if (content == null) {
+        return
+    }
+
     text.setAttribute('fill', colorInput.value)
     text.setAttribute('x', localpoint.x)
     text.setAttribute('y', localpoint.y)
-    var textnode = document.createTextNode(name);
+    text.setAttribute('font-size', 12*widthInput.value)
+    var textnode = document.createTextNode(content);
 
     text.appendChild(textnode)
+    svg.append(text)  // 插入svg
     // let startPos = mousePos(svg)   // 获取鼠标相对svg的位置
     //
     // function drawEllipse() {

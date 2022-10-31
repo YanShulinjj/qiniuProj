@@ -34,9 +34,13 @@ let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
 let clear = document.querySelector('.clear')
 let hidden = document.querySelector('.hidden')
+let pagelist = document.querySelector('.icon-qiniu-list')
+
+
 let drawandnosave = false   // 没有修改过画面。为true  // 用来判断是否需要保存
 let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
+let ispagelist = false     // 定义是否点击了pagelist
 let mousedownonelement = false
 
 svgContainer.addEventListener('mousedown', (e) => {
@@ -290,34 +294,35 @@ svgContainer.addEventListener('mousedown', (e) => {
 })
 
 
-// 将所有按钮隐藏
-hidden.addEventListener('click', (e) => {
+
+// 点击显示pagelist
+pagelist.addEventListener('click', (e) => {
     //
-    console.log("点击了隐藏")
-    ishidden = !ishidden
-    if (ishidden)  {
-        // 左右侧隐藏
-        document.getElementsByClassName("toolContainer")[0].style.display="none"
-        var elements = document.getElementsByClassName("hiddenbutton")
-        var i
-        for (i = 0; i < elements.length; i++) {
-            elements[i].style.display = "none";
-        }
-        // 将顶部按钮宽度更新
-        document.getElementsByClassName("addundobar")[0].style.width = "80px"
+    console.log("点击了pagelist")
+    ispagelist = !ispagelist
+    if (ispagelist)  {
+        // 显示pagelist
+        var element = document.getElementsByClassName("page-list-open")[0]
+
+        element.setAttribute("style","margin-top: 10px;display: block;width: " +
+            "80px;background-color:rgb(94 170 255);border-radius: 10px;" +
+            "border: solid 2px rgb(255, 255, 255);")
     } else {
-        // 左右侧显示
-        document.getElementsByClassName("toolContainer")[0].style.display="flex"
-        var elements = document.getElementsByClassName("hiddenbutton")
-        var i
-        for (i = 0; i < elements.length; i++) {
-            elements[i].style.display = "block";
-        }
-        // 将顶部按钮宽度更新
-        document.getElementsByClassName("addundobar")[0].style.width = "400px"
-
+        // 显示pagelist
+        var element = document.getElementsByClassName("page-list-open")[0]
+        element.setAttribute("style","display: node;")
+        // // 实现hover效果
+        // // 为element注册鼠标进入事件
+        // element.onmouseover = function () {
+        //     element.setAttribute("style","margin-top: 10px;display: block;width: " +
+        //         "80px;background-color:rgb(94 170 255);border-radius: 10px;" +
+        //         "border: solid 2px rgb(255, 255, 255);")
+        // };
+        // // 为element注册鼠标离开事件
+        // element.onmouseout = function () {
+        //     element.setAttribute("style","display: node;")
+        // };
     }
-
 })
 
 

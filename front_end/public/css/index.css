@@ -132,9 +132,6 @@ body , html{
 
 }
 
-
-
-
 /*  背景色和FIll*/
 label.back-bgc, label.forth-bgc {
     position: absolute;
@@ -366,7 +363,7 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
     height: 50px;
     border: solid 2px rgb(94 170 255);
     border-radius: 20px;
-    font-size: 25px;
+    /*font-size: 25px;*/
     color: rgb(255, 255, 255);
     background-color: rgb(94 170 255);
     box-shadow:0px 0px 0px 0px #00000000;
@@ -390,14 +387,25 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
 }
 
 
-/*下拉列表style*/
+/* ------------------------下拉列表------------------------ */
 .page-list-open {
     display: none;
 }
 
 .icon-qiniu-list:hover .page-list-open{
+    margin-top: 10px;
     display: block;
+    width: 80px;
+    background-color: rgb(94 170 255);
+    border-radius: 10px;
+    border: solid 2px rgb(255, 255, 255);
 }
+
+.page-list-open > ul > li {
+    /*display: block;*/
+    border-bottom: solid 2px #854ac4;
+}
+
 
 /*.icon-qiniu-list div ul li:hover {*/
 /*    display: block;*/
