@@ -1,3 +1,4 @@
+/* ----------------------- 变量定义区 -------------------------------- */
 let svgContainer = document.querySelector('div.svgContainer')
 let svg = document.querySelector('.svg')
 let svgparent = document.querySelector('.svgparent')
@@ -20,9 +21,9 @@ let widthInput = document.querySelector('input[type="range"]')  //笔画粗细
 let pen = document.querySelector('#icon-qiniu-huabi')
 let linear = document.querySelector('#icon-qiniu-line')
 let circle = document.querySelector('#icon-qiniu-ellipse')
-let rect = document.querySelector('#icon-qiniu-rectangle')
+let rect = document.querySelector('#icon-qiniu-square')
 let eraser = document.querySelector('#icon-qiniu-eraser')
-let roundrect = document.querySelector('#icon-qiniu-square')
+let roundrect = document.querySelector('#icon-qiniu-rectangle')
 let textedit = document.querySelector('#icon-qiniu-text')
 
 
@@ -56,12 +57,26 @@ const TextType = 6
 const UndoType = 7
 const RedoType = 8
 const ClearType = 9
+const LoadType = 10
+const CommonType = 11
 
 // 记录各种图形的id
 let polylineNum = 1
 let ellipseNum = 1
 let rectangleNum = 1
 let lineNum = 1
+
+// 页面名称
+let saveFileName = 'xxxx.svg'
+
+// 用于撤销和反撤销
+let elementQueue = []
+let queueSize = 0
+let maxSize = 10
+let index = -1
+
+
+/* -----------------------事件定义区 -------------------------------- */
 
 svgContainer.addEventListener('mousedown', (e) => {
     //背景色改变
@@ -155,6 +170,17 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
 
             svg.append(polyline)
+
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: polyline})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
             console.log(2)
 
             let points = `${penStartPos.x} ${penStartPos.y} `   // 鼠标坐标
@@ -191,9 +217,9 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
 
             svgContainer.addEventListener('mousemove', drawDot)
+            svgContainer.addEventListener('mouseup',  function onceDot(){
 
-            svgContainer.addEventListener('mouseup',  (once) => {
-                svgContainer.removeEventListener('mouseup', once)
+                svgContainer.removeEventListener('mouseup', onceDot)
                 svgContainer.removeEventListener('mousemove', drawDot)
             })
         }
@@ -241,10 +267,30 @@ svgContainer.addEventListener('mousedown', (e) => {
                 }
                 client.send(JSON.stringify(msg))
             }
-            ellipseNum ++
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: ellipse})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
+
             document.addEventListener('mousemove', drawEllipse)   // 持续运行
 
             document.addEventListener('mouseup', function once() {  // 解绑
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: CircleType,
+                    Attr: {
+                        id: ellipseNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                ellipseNum ++
                 document.removeEventListener('mouseup', once)
                 document.removeEventListener('mousemove', drawEllipse)
             })
@@ -320,13 +366,34 @@ svgContainer.addEventListener('mousedown', (e) => {
                 client.send(JSON.stringify(msg))
 
             }
-            rectangleNum ++
-            svgContainer.addEventListener('mousemove', drawRect)
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: rect})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
 
-            svgContainer.addEventListener('mouseup', (rectE) => {
-                svgContainer.removeEventListener('mousemove', drawRect)
-                svgContainer.removeEventListener('mouseuo', rectE)
+            svgContainer.addEventListener('mousemove', drawRect)
+            svgContainer.addEventListener('mouseup', function onceRect(){
+                    // 多人协作, 发送结束标记
+                    let msg = {
+                        type: RetangleType,
+                        Attr: {
+                            id: rectangleNum,
+                            isEnd: true,
+                        },
+                    }
+                    client.send(JSON.stringify(msg))
+                    rectangleNum ++
+                    console.log("完成矩形勾画")
+                    svgContainer.removeEventListener('mousemove', drawRect)
+                    svgContainer.removeEventListener('mouseup', onceRect)
             })
+
         }
         // 直线
         if (linear.checked) {
@@ -371,11 +438,31 @@ svgContainer.addEventListener('mousedown', (e) => {
                 client.send(JSON.stringify(msg))
 
             }
-            lineNum++
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: linear})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
+
             svgContainer.addEventListener('mousemove', drawLinear)
 
-            svgContainer.addEventListener('mouseup', (linerE) => {
-                svgContainer.removeEventListener('mouseup', linerE)
+            svgContainer.addEventListener('mouseup', function onceLinear() {
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: LineType,
+                    Attr: {
+                        id: lineNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                lineNum++
+                svgContainer.removeEventListener('mouseup', onceLinear)
                 svgContainer.removeEventListener('mousemove', drawLinear)
             })
         }
@@ -426,6 +513,15 @@ pagelist.addEventListener('click', (e) => {
 
 // 清除所画内容
 clear.addEventListener('click', (clickE) => {
+    // 将此操作加入队列
+    // 添加之前删除index 后面所有的elem
+    elementQueue.splice(index+1, elementQueue.length-index-1)
+    elementQueue.push({type: ClearType, value: svg.innerHTML})
+    if (elementQueue.length > maxSize) {
+        elementQueue.shift()
+    } else {
+        index ++
+    }
     svg.innerHTML = ''
     // 多人协作
     let msg = {
@@ -453,15 +549,50 @@ fileInput.addEventListener('change', e => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
         svg = document.querySelector('.svg')
+        let msg = {
+            type: LoadType,
+            Attr: {
+                content: svgFileContent
+            }
+        }
+        client.send(JSON.stringify(msg))
     })
     fr.readAsText(svgFile)
 })
 
-// 撤销
+// 撤销与反撤销
 document.addEventListener("keydown", function (event) {
-    if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
-        if (svg.lastChild) {
-            svg.lastChild.remove()
+    if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
+        console.log("redo, ", index, elementQueue.length)
+        if (elementQueue.length > 0 && index < elementQueue.length-1) {
+            console.log("redo#, ", index, elementQueue.length)
+            index ++
+            if (elementQueue[index].type == CommonType) {
+                svg.append(elementQueue[index].value)
+            } else if (elementQueue[index].type == ClearType) {
+                svg.innerHTML = ''
+            }
+            let msg = {
+                type: RedoType,
+            }
+            client.send(JSON.stringify(msg))
+        }
+    } else if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
+        // if (svg.lastChild) {
+        //     svg.lastChild.remove()
+        //     let msg = {
+        //         type: UndoType,
+        //     }
+        //     client.send(JSON.stringify(msg))
+        // }
+        // 撤销
+        if (elementQueue.length > 0 && index >= 0) {
+            if (elementQueue[index].type == CommonType) {
+                svg.lastChild.remove()
+            } else if (elementQueue[index].type == ClearType) {
+                svg.innerHTML = elementQueue[index].value
+            }
+            index --
             let msg = {
                 type: UndoType,
             }
@@ -469,6 +600,8 @@ document.addEventListener("keydown", function (event) {
         }
     }
 })
+
+// 反撤销
 
 // 下面是退出浏览器提示
 window.onbeforeunload = function () {
@@ -487,7 +620,7 @@ saveFile.addEventListener('click' ,function save(){
     var url = URL.createObjectURL(blob)
     var anchor = document.createElement("a")
     anchor.href = url
-    anchor.download = "xxxx.svg"
+    anchor.download = saveFileName
     anchor.click()  // 点击button 也触发a标签点击
     // TODO：持久化此页面
 })
@@ -498,8 +631,20 @@ addPage.addEventListener("click", function add(){
 
 // 撤销上一步
 undo.addEventListener("click", function (e) {
-    if (svg.lastChild) {
-        svg.lastChild.remove()
+    // if (svg.lastChild) {
+    //     svg.lastChild.remove()
+    //     let msg = {
+    //         type: UndoType,
+    //     }
+    //     client.send(JSON.stringify(msg))
+    // }
+    if (elementQueue.length > 0 && index >= 0) {
+        if (elementQueue[index].type == CommonType) {
+            svg.lastChild.remove()
+        } else if (elementQueue[index].type == ClearType) {
+            svg.innerHTML = elementQueue[index].value
+        }
+        index --
         let msg = {
             type: UndoType,
         }

@@ -10,7 +10,7 @@ function link () {
         let data = e.data
         let msg = JSON.parse(data)
 
-        console.log("接受到的消息：" + data)
+        // console.log("接受到的消息：" + data)
 
         switch (msg.type) {
             case PolylineType:
@@ -23,20 +23,46 @@ function link () {
                 polyline.setAttribute('fill', msg.Attr.fillValue)
                 polyline.setAttribute('points', msg.Attr.points)
                 svg.append(polyline)
+                polylineNum = parseInt(msg.Attr.id) + 1
+                // 将此操作加入队列
+                // 添加之前删除index 后面所有的elem
+                elementQueue.splice(index+1, elementQueue.length-index-1)
+                elementQueue.push({type: CommonType, value: polyline})
+                if (elementQueue.length > maxSize) {
+                    // 移除队头
+                    elementQueue.shift()
+                } else {
+                    index ++
+                }
                 break
             case DotType:
                 var polyline = document.getElementById(msg.Attr.id)
-                polylineNum = msg.Attr.id + 1
+
                 points = polyline.getAttribute("points")
                 points += msg.Attr.appendPoint
                 polyline.setAttribute("points", points)
                 break
             case LineType:
                 var linear = document.getElementById('line_'+msg.Attr.id)
+
+                if (msg.Attr.isEnd == true) {
+                    // 将此操作加入队列
+                    // 添加之前删除index 后面所有的elem
+                    elementQueue.splice(index+1, elementQueue.length-index-1)
+                    elementQueue.push({type: CommonType, value: linear})
+                    if (elementQueue.length > maxSize) {
+                        // 移除队头
+                        elementQueue.shift()
+                    } else {
+                        index ++
+                    }
+                    break
+                }
+
                 if (linear == null) {
                     linear = document.createElementNS("http://www.w3.org/2000/svg", 'line')
                     linear.setAttribute('id', 'line_' + msg.Attr.id)
-                    lineNum = msg.Attr.id+1
+                    lineNum = parseInt(msg.Attr.id) + 1
                 }
                 linear.setAttribute('stroke', msg.Attr.color)
                 linear.setAttribute('stroke-width', msg.Attr.stroke_width)
@@ -48,13 +74,29 @@ function link () {
                 linear.setAttribute('y2', msg.Attr.y2)
                 linear.setAttribute('fill', msg.Attr.fillValue)
                 svg.append(linear)
+
                 break
             case CircleType:
                 var ellipse = document.getElementById('ellipse_' + msg.Attr.id)
+
+                if (msg.Attr.isEnd == true) {
+                    // 将此操作加入队列
+                    // 添加之前删除index 后面所有的elem
+                    elementQueue.splice(index+1, elementQueue.length-index-1)
+                    elementQueue.push({type: CommonType, value: ellipse})
+                    if (elementQueue.length > maxSize) {
+                        // 移除队头
+                        elementQueue.shift()
+                    } else {
+                        index ++
+                    }
+                    break
+                }
+
                 if (ellipse == null) {
                     ellipse = document.createElementNS("http://www.w3.org/2000/svg", 'ellipse')
                     ellipse.setAttribute('id', 'ellipse_' + msg.Attr.id)
-                    ellipseNum = msg.Attr.id+1
+                    ellipseNum = parseInt(msg.Attr.id) + 1
                 }
 
                 // 然后加一堆属性
@@ -66,14 +108,30 @@ function link () {
                 ellipse.setAttribute('rx', msg.Attr.rx)
                 ellipse.setAttribute('ry', msg.Attr.ry)
                 svg.append(ellipse)
+
                 break
             case RetangleType:
                 var rect = document.getElementById('rect_'+msg.Attr.id)
-                console.log("hhh")
+
+                if (msg.Attr.isEnd === true) {
+                    // 将此操作加入队列
+                    // 添加之前删除index 后面所有的elem
+                    console.log("attr is false")
+                    elementQueue.splice(index+1, elementQueue.length-index-1)
+                    elementQueue.push({type: CommonType, value: rect})
+                    if (elementQueue.length > maxSize) {
+                        // 移除队头
+                        elementQueue.shift()
+                    } else {
+                        index ++
+                    }
+                    break
+                }
+
                 if (rect == null) {
                     rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect')
                     rect.setAttribute('id', 'rect_' + msg.Attr.id)
-                    rectangleNum = msg.Attr.id+1
+                    rectangleNum = parseInt(msg.Attr.id) + 1
                 }
                 rect.setAttribute('stroke', msg.Attr.color)
                 rect.setAttribute('stroke-width', msg.Attr.stroke_width)
@@ -85,6 +143,7 @@ function link () {
                 rect.setAttribute('rx', msg.Attr.rx)
                 rect.setAttribute('ry', msg.Attr.ry)
                 svg.append(rect)
+
                 break
             case TextType:
                 var text = document.createElementNS("http://www.w3.org/2000/svg", 'text')   // 创建圆的标签
@@ -96,17 +155,54 @@ function link () {
 
                 text.appendChild(textnode)
                 svg.append(text)  // 插入svg
+                // 将此操作加入队列
+                // 添加之前删除index 后面所有的elem
+                elementQueue.splice(index+1, elementQueue.length-index-1)
+                elementQueue.push({type: CommonType, value: text})
+                if (elementQueue.length > maxSize) {
+                    // 移除队头
+                    elementQueue.shift()
+                } else {
+                    index ++
+                }
                 break
             case UndoType:
-                if (svg.lastChild) {
-                    svg.lastChild.remove()
+                if (elementQueue.length > 0 && index >= 0) {
+                    if (elementQueue[index].type == CommonType) {
+                        svg.lastChild.remove()
+                    } else if (elementQueue[index].type == ClearType) {
+                        svg.innerHTML = elementQueue[index].value
+                    }
+                    index --
                 }
                 break
             case RedoType:
                 // TODO
+                if (elementQueue.length > 0 && index < elementQueue.length -1) {
+                    index ++
+                    if (elementQueue[index].type == CommonType) {
+                        svg.append(elementQueue[index].value)
+                    } else if (elementQueue[index].type == ClearType) {
+                        svg.innerHTML = ''
+                    }
+                }
                 break
             case ClearType:
+                // 将此操作加入队列
+                // 添加之前删除index 后面所有的elem
+                elementQueue.splice(index+1, elementQueue.length-index-1)
+                elementQueue.push({type: ClearType, value: svg.innerHTML})
+                if (elementQueue.length > maxSize) {
+                    // 移除队头
+                    elementQueue.shift()
+                } else {
+                    index ++
+                }
                 svg.innerHTML = ''
+                break
+            case LoadType:
+                svgparent.innerHTML = msg.Attr.content
+                svg = document.querySelector('.svg')
                 break
             default:
                 console.log("不支持的消息类型")

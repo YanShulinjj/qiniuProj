@@ -48,6 +48,16 @@ window.createtext = function (localpoint, svg) {
     text.appendChild(textnode)
     svg.append(text)  // 插入svg
 
+    // 将此操作加入队列
+    // 添加之前删除index 后面所有的elem
+    elementQueue.splice(index+1, elementQueue.length-index-1)
+    elementQueue.push({type: CommonType, value: text})
+    if (elementQueue.length > maxSize) {
+        // 移除队头
+        elementQueue.shift()
+    } else {
+        index ++
+    }
     // 多人协作
     let msg = {
         type: TextType,
