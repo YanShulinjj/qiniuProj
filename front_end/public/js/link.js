@@ -1,6 +1,6 @@
 // 客户端与服务端建立websocket链接
 function link () {
-    client = new WebSocket("ws://localhost:9999/ws/wedraw");    //连接服务器
+    client = new WebSocket("ws://localhost:9999/ws/wedraw?page="+document.getElementById("pageName").innerText);    //连接服务器
     client.onopen = function(e){
         alert('连接服务器成功！');
     };

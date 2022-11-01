@@ -44,6 +44,7 @@ let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
 let ispagelist = false     // 定义是否点击了pagelist
 let mousedownonelement = false
+let readonly = false
 
 
 // type 编号
@@ -59,6 +60,7 @@ const RedoType = 8
 const ClearType = 9
 const LoadType = 10
 const CommonType = 11
+const ModeChangeType = 12
 
 // 记录各种图形的id
 let polylineNum = 1
@@ -647,18 +649,25 @@ undo.addEventListener("click", function (e) {
 
 // TODO redo
 redo.addEventListener("click", function (e) {
-    if (elementQueue.length > 0 && index < elementQueue.length-1) {
-        index ++
-        if (elementQueue[index].type == CommonType) {
-            svg.append(elementQueue[index].value)
-        } else if (elementQueue[index].type == ClearType) {
-            svg.innerHTML = ''
-        }
-        let msg = {
-            type: RedoType,
-        }
-        client.send(JSON.stringify(msg))
+    // if (elementQueue.length > 0 && index < elementQueue.length-1) {
+    //     index ++
+    //     if (elementQueue[index].type == CommonType) {
+    //         svg.append(elementQueue[index].value)
+    //     } else if (elementQueue[index].type == ClearType) {
+    //         svg.innerHTML = ''
+    //     }
+    //     let msg = {
+    //         type: RedoType,
+    //     }
+    //     client.send(JSON.stringify(msg))
+    // }
+
+    readonly = !readonly
+    let msg = {
+        type: ModeChangeType,
+        Attr: readonly,
     }
+    client.send(JSON.stringify(msg))
 })
 
 
