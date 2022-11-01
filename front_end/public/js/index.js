@@ -30,7 +30,7 @@ let textedit = document.querySelector('#icon-qiniu-text')
 //按钮
 let addPage = document.querySelector('.add')
 let undo = document.querySelector('.undo')
-// let redo = document.querySelector('.redo')
+let redo = document.querySelector('.redo')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -563,7 +563,7 @@ fileInput.addEventListener('change', e => {
 // 撤销与反撤销
 document.addEventListener("keydown", function (event) {
     if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
-        console.log("redo, ", index, elementQueue.length)
+        // console.log("redo, ", index, elementQueue.length)
         if (elementQueue.length > 0 && index < elementQueue.length-1) {
             console.log("redo#, ", index, elementQueue.length)
             index ++
@@ -631,13 +631,6 @@ addPage.addEventListener("click", function add(){
 
 // 撤销上一步
 undo.addEventListener("click", function (e) {
-    // if (svg.lastChild) {
-    //     svg.lastChild.remove()
-    //     let msg = {
-    //         type: UndoType,
-    //     }
-    //     client.send(JSON.stringify(msg))
-    // }
     if (elementQueue.length > 0 && index >= 0) {
         if (elementQueue[index].type == CommonType) {
             svg.lastChild.remove()
@@ -653,9 +646,20 @@ undo.addEventListener("click", function (e) {
 })
 
 // TODO redo
-// redo.addEventListener("click", function (e) {
-//    //
-// })
+redo.addEventListener("click", function (e) {
+    if (elementQueue.length > 0 && index < elementQueue.length-1) {
+        index ++
+        if (elementQueue[index].type == CommonType) {
+            svg.append(elementQueue[index].value)
+        } else if (elementQueue[index].type == ClearType) {
+            svg.innerHTML = ''
+        }
+        let msg = {
+            type: RedoType,
+        }
+        client.send(JSON.stringify(msg))
+    }
+})
 
 
 // 鼠标相对于元素的位置

@@ -16,6 +16,7 @@ hidden.addEventListener('click', (e) => {
         }
         // 将顶部按钮宽度更新
         document.getElementsByClassName("addundobar")[0].style.width = "80px"
+
     } else {
         // 左右侧显示
         document.getElementsByClassName("toolContainer")[0].style.display="flex"

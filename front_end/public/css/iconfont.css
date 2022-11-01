@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3733041 */
-  src: url('../font/iconfont.woff2?t=1666939212211') format('woff2'),
-       url('../font/iconfont.woff?t=1666939212211') format('woff'),
-       url('../font/iconfont.ttf?t=1666939212211') format('truetype');
+  src: url('../font/iconfont.woff2?t=1667287041783') format('woff2'),
+       url('../font/iconfont.woff?t=1667287041783') format('woff'),
+       url('../font/iconfont.ttf?t=1667287041783') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,18 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-qiniu-watch:before {
+  content: "\e67c";
+}
+
+.icon-qiniu-redo:before {
+  content: "\e749";
+}
+
+.icon-qiniu-undo:before {
+  content: "\e75d";
 }
 
 .icon-qiniu-hidden:before {
@@ -39,10 +51,6 @@
 
 .icon-qiniu-eraser:before {
   content: "\e6ed";
-}
-
-.icon-qiniu-undo:before {
-  content: "\eaf0";
 }
 
 .icon-qiniu-huabi:before {
