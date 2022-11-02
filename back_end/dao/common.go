@@ -26,6 +26,7 @@ var ctx context.Context
 
 func init() {
 	svcCtx = newServiceContext(config.C)
+	ctx = context.Background()
 }
 
 func newServiceContext(c config.Config) *ServiceContext {

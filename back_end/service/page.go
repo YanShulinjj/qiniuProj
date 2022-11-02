@@ -29,7 +29,7 @@ func NewPage() *pageService {
 }
 
 // Add 指定用户新建一个page
-func (*pageService) Add(username string) (string, int64, error) {
+func (*pageService) Add(username, pageName string) (string, int64, error) {
 	// 首先根据username获取userid和pageIdx
 	userid, pageIdx, err := dao.NewUser().Query(username)
 	if err != nil {
@@ -38,7 +38,7 @@ func (*pageService) Add(username string) (string, int64, error) {
 	pageIdx += 1
 	// 生成一个svgPath路径
 	svgPath := svg.GenPath(userid, pageIdx)
-	_, err = dao.NewPage().Create(userid, pageIdx, svgPath)
+	_, err = dao.NewPage().Create(userid, pageIdx, pageName, svgPath)
 	if err != nil {
 		return "", 0, err
 	}
@@ -60,4 +60,15 @@ func (*pageService) Drop(username string, pageIdx int64) (string, error) {
 	}
 	filename := svg.ParseFileName(avgPath)
 	return filename, err
+}
+
+func (*pageService) Query(username string) ([][]string, error) {
+	// 首先根据username获取userid
+	userid, _, err := dao.NewUser().Query(username)
+	if err != nil {
+		return nil, err
+	}
+
+	pages, err := dao.NewPage().QueryPages(userid)
+	return pages, err
 }

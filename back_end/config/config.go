@@ -10,16 +10,15 @@ import (
 	"flag"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/stores/cache"
-	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
-	zrpc.RpcServerConf
 	Mysql struct {
 		DataSource string
 	}
 	CacheRedis cache.CacheConf
 	Host       string
+	Port       string
 	SVGPATH    string
 }
 

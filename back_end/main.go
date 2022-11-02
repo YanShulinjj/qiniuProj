@@ -6,7 +6,9 @@
 
 package main
 
+import "qiniu/config"
+
 func main() {
 	r := InitRouter()
-	r.Run()
+	r.Run(config.C.Host + config.C.Port)
 }

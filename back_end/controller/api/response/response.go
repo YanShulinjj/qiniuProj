@@ -15,10 +15,20 @@ type Status struct {
 
 type Register struct {
 	Status
-	UserID int64 `json:"user_id"`
+	UserID   int64  `json:"user_id"`
+	UserName string `json:"user_name"`
 }
 
 type AddPage struct {
 	Status
 	PageIdx int64 `json:"page_idx"`
+}
+
+type Page struct {
+	PageName string `json:"page_name"`
+	SvgPath  string `json:"svg_path"`
+}
+type PageList struct {
+	Status
+	Items []*Page `json:"list"`
 }

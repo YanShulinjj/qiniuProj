@@ -618,11 +618,14 @@ saveFile.addEventListener('click' ,function save(){
 
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
-    var url = URL.createObjectURL(blob)
-    var anchor = document.createElement("a")
-    anchor.href = url
-    anchor.download = saveFileName
-    anchor.click()  // 点击button 也触发a标签点击
+    // var url = URL.createObjectURL(blob)
+    // var anchor = document.createElement("a")
+    // anchor.href = url
+    // anchor.download = saveFileName
+    // anchor.click()  // 点击button 也触发a标签点击
+
+    // 发起POST请求
+    UploadSVG()
     // TODO：持久化此页面
 })
 addPage.addEventListener("click", function add(){
@@ -678,6 +681,26 @@ rwMode.addEventListener("click", function (e){
     client.send(JSON.stringify(msg))
 })
 
+
+function UploadSVG() {
+    var svgSource = svg.outerHTML
+    var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
+
+    var fd = new FormData();
+    fd.append('username', userName)
+    fd.append('pagename', pageName)
+    fd.append('data', blob)
+    $.ajax({
+        type: 'POST',
+        url: 'http://127.0.0.1:8080/backend/page/upload',
+        data: fd,
+        processData: false,
+        contentType: false
+    }).done(function (data) {
+        // 服务器返回的数据
+        console.log(data)
+    })
+}
 
 // 鼠标相对于元素的位置
 function mousePos(node) {

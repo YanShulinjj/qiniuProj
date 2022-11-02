@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"path/filepath"
 	"qiniu/config"
 	"qiniu/controller/api/response"
@@ -27,17 +28,17 @@ func NewPageController() *pageController {
 
 func (*pageController) Add(c *gin.Context) {
 	username := c.Query("username")
-	svgFileName, pageIdx, err := service.NewPage().Add(username)
+	pagename := c.DefaultQuery("pagename", "unnamed")
+	svgFileName, pageIdx, err := service.NewPage().Add(username, pagename)
 	if err != nil {
-		c.JSON(http.StatusOK, response.AddPage{
+		c.JSON(http.StatusNotFound, response.AddPage{
 			Status: response.Status{
 				xerr.ReuqestParamErr,
-				"添加页面出错！",
+				"添加页面出错！" + err.Error(),
 			},
 		})
 		return
 	}
-
 	// svgPath
 	svgPath := filepath.Join(config.C.SVGPATH, svgFileName)
 	// 保存到服务器
@@ -47,4 +48,71 @@ func (*pageController) Add(c *gin.Context) {
 		Status:  response.Status{},
 		PageIdx: pageIdx,
 	})
+}
+
+func (*pageController) PageList(c *gin.Context) {
+	username := c.Query("username")
+
+	pages, err := service.NewPage().Query(username)
+	if err != nil {
+		c.JSON(http.StatusNotFound, response.PageList{
+			Status: response.Status{
+				xerr.ReuqestParamErr,
+				"添加页面出错！",
+			},
+		})
+		return
+	}
+	var items []*response.Page
+	for _, page := range pages {
+		items = append(items,
+			&response.Page{
+				PageName: page[0],
+				SvgPath:  page[1],
+			})
+	}
+	c.JSON(http.StatusOK, response.PageList{
+		Items: items,
+	})
+}
+
+func (*pageController) UploadSVG(c *gin.Context) {
+	// 从客户端传输svg文件
+	username := c.PostForm("username")
+	filename := c.PostForm("pagename")
+	data, err := c.FormFile("data")
+	if err != nil {
+		c.JSON(http.StatusOK, response.Status{
+			xerr.ReuqestParamErr,
+			"上传文件错误，未识别出文件",
+		})
+		return
+	}
+	// 保存到服务端
+	saveDir := filepath.Join("./data/svg/", username)
+
+	// 如果文件夹不存在
+	if _, err := os.Stat(saveDir); os.IsNotExist(err) {
+		err = os.Mkdir(saveDir, os.ModePerm)
+		if err != nil {
+			c.JSON(http.StatusOK, response.Status{
+				xerr.ReuqestParamErr,
+				"服务端创建文件夹失败",
+			})
+			return
+		}
+	}
+	saveFile := filepath.Join(saveDir, filename)
+	if err := c.SaveUploadedFile(data, saveFile); err != nil {
+		c.JSON(http.StatusOK, response.Status{
+			xerr.ReuqestParamErr,
+			"上传文件错误，未识别出文件" + err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, response.Status{
+		0,
+		"ok",
+	})
+
 }

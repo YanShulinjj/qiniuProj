@@ -9,14 +9,10 @@
 
 - 运行步骤：
 
-  1. ```bash
-     $ cd back_end/ws
-     go run start.go
-     ```
-
   2. ```bash
      $ cd ..
      go run main.go
      ```
 
   3. 浏览器输入地址 127.0.0.1:8080/qiniu?page=1
+

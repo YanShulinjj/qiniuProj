@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"qiniu/controller/api/response"
+	"qiniu/pkg/name"
 	"qiniu/pkg/xerr"
 	"qiniu/service"
 )
@@ -24,6 +25,9 @@ func NewUserController() *userController {
 
 func (*userController) Register(c *gin.Context) {
 	username := c.Query("username")
+	if username == "unnamed" {
+		username = name.GetDefaultName()
+	}
 	userId, err := service.NewUser().Add(username)
 	if err != nil {
 		c.JSON(http.StatusOK, response.Register{
@@ -35,7 +39,8 @@ func (*userController) Register(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.Register{
-		Status: response.Status{},
-		UserID: userId,
+		Status:   response.Status{},
+		UserID:   userId,
+		UserName: username,
 	})
 }
