@@ -59,15 +59,6 @@
         </section>
         <!-- 画板部分 结束 -->
 
-<!--        &lt;!&ndash; 顶部按钮  &ndash;&gt;-->
-<!--        <div class="save-open-clear">-->
-<!--            <button class="save">save</button>-->
-<!--            <button class="open">open</button>-->
-<!--            <div class="clear">clear</div>-->
-<!--            <input type="file" id="fileInput" accept=".svg" hidden>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; 顶部按钮 结束 &ndash;&gt;-->
-
         <!-- 顶部按钮  -->
         <div class="add-undo-rangeBox">
             <div class="addundobar">
@@ -103,6 +94,12 @@
                 <label  class="iconfont hiddenbutton icon-qiniu-add">
                     <button class="add"></button>
                 </label>
+                <label id="rwMode" class="iconfont hiddenbutton icon-qiniu-readonly"
+                       data-before='W'>
+                    <button class="rwMode"></button>
+                </label>
+
+
                 <label  class="iconfont hiddenbutton icon-qiniu-redo">
                     <button class="redo"></button>
                 </label>
@@ -111,7 +108,7 @@
                 </label>
             </div>
         </div>
-        <!-- 底部按钮 结束 -->
+        <!-- 顶部按钮 结束 -->
 
         <!-- 画板中心：构造图形-->
         <div class="svgparent">

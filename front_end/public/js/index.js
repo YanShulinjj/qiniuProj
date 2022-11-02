@@ -29,6 +29,7 @@ let textedit = document.querySelector('#icon-qiniu-text')
 
 //按钮
 let addPage = document.querySelector('.add')
+let rwMode = document.querySelector('.rwMode')
 let undo = document.querySelector('.undo')
 let redo = document.querySelector('.redo')
 let saveFile = document.querySelector('.save')
@@ -603,8 +604,6 @@ document.addEventListener("keydown", function (event) {
     }
 })
 
-// 反撤销
-
 // 下面是退出浏览器提示
 window.onbeforeunload = function () {
   if (drawandnosave) {
@@ -649,20 +648,29 @@ undo.addEventListener("click", function (e) {
 
 // TODO redo
 redo.addEventListener("click", function (e) {
-    // if (elementQueue.length > 0 && index < elementQueue.length-1) {
-    //     index ++
-    //     if (elementQueue[index].type == CommonType) {
-    //         svg.append(elementQueue[index].value)
-    //     } else if (elementQueue[index].type == ClearType) {
-    //         svg.innerHTML = ''
-    //     }
-    //     let msg = {
-    //         type: RedoType,
-    //     }
-    //     client.send(JSON.stringify(msg))
-    // }
+    if (elementQueue.length > 0 && index < elementQueue.length-1) {
+        index ++
+        if (elementQueue[index].type == CommonType) {
+            svg.append(elementQueue[index].value)
+        } else if (elementQueue[index].type == ClearType) {
+            svg.innerHTML = ''
+        }
+        let msg = {
+            type: RedoType,
+        }
+        client.send(JSON.stringify(msg))
+    }
+})
 
+// TODO rwMode
+rwMode.addEventListener("click", function (e){
     readonly = !readonly
+    // 将按钮图标更换
+    if (readonly) {
+        document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
+    } else {
+        document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
+    }
     let msg = {
         type: ModeChangeType,
         Attr: readonly,

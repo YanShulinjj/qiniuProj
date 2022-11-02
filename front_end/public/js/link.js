@@ -1,11 +1,11 @@
 // 客户端与服务端建立websocket链接
 function link () {
-    client = new WebSocket("ws://localhost:9999/ws/wedraw?page="+document.getElementById("pageName").innerText);    //连接服务器
-    client.onopen = function(e){
-        alert('连接服务器成功！');
-    };
+    client = new WebSocket("ws://192.168.137.1:9999/ws/wedraw?page="+document.getElementById("pageName").innerText);    //连接服务器
+    // client.onopen = function(e){
+    //     alert('连接服务器成功！');
+    // };
 
-    // 从服务器接受数据
+    // 从服务器接收数据
     client.onmessage = function (e) {
         let data = e.data
         let msg = JSON.parse(data)
@@ -203,6 +203,15 @@ function link () {
             case LoadType:
                 svgparent.innerHTML = msg.Attr.content
                 svg = document.querySelector('.svg')
+                break
+            case ModeChangeType:
+                readonly = msg.Attr
+                // 将按钮图标更换
+                if (readonly) {
+                    document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
+                } else {
+                    document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
+                }
                 break
             default:
                 console.log("不支持的消息类型")

@@ -53,7 +53,6 @@ func (c *Client) Read(m *Manager) {
 		// 如果收到调整 读写模式
 		if msg.Type == ModeChangeType {
 			m.ReadOnly = msg.Attr.(bool)
-			continue
 		}
 		// 如果当前客户端是所有者
 		// 或则是可读可写模式

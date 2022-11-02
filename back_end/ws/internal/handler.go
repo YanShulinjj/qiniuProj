@@ -32,8 +32,15 @@ func WSHandler(ctx *gin.Context) { // 参数为 ctx *gin.Context 的即为 gin�
 	}
 
 	// 生成uuid，作为sessionid
-	id := fmt.Sprintf("%s_%d", ctx.Request.RemoteAddr, seq)
-	atomic.AddInt64(&seq, 1)
+	// id := fmt.Sprintf("%s_%d", ctx.Request.RemoteAddr, seq)
+	// atomic.AddInt64(&seq, 1)
+	var id string
+	if IPMode {
+		id = ctx.ClientIP()
+	} else {
+		id = fmt.Sprintf("%s_%d", ctx.ClientIP(), seq)
+		atomic.AddInt64(&seq, 1)
+	}
 
 	// 设置http头部，添加sessionid
 	heq := make(http.Header)
