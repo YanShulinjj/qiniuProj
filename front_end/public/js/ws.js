@@ -219,11 +219,11 @@ function ws () {
     }
 
     client.onclose = function(e){
-        alert("已经与服务器断开连接\r\n当前连接状态：" + this.readyState);
+        alert("连接失败, 检测是否重复建立连接：" + this.readyState);
     };
 
     client.onerror = function(e){
-        alert("WebSocket异常！");
+        alert("连接失败, 检测是否重复建立连接！");
     };
 }
 

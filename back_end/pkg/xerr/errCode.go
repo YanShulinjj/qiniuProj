@@ -26,4 +26,7 @@ const (
 	PersistenceErr ErrCodeType = 300000 + iota
 	PageExistedErr
 	PageNotExistErr
+
+	// 客户端已经连接
+	ClientExistedErr ErrCodeType = 400000 + iota
 )

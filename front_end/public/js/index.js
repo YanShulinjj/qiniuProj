@@ -631,6 +631,15 @@ saveFile.addEventListener('click' ,function save(){
 addPage.addEventListener("click", function add(){
     // TODO: 添加新页面
     console.log("点击了add")
+    content=prompt("请输入页面名称：");
+    console.log(content);//4
+    // 如果取消 直接返回
+    if (content == null) {
+        return
+    }
+    // 发起addpage请求
+    AddPage(content)
+
 })
 
 // 撤销上一步
@@ -681,26 +690,6 @@ rwMode.addEventListener("click", function (e){
     client.send(JSON.stringify(msg))
 })
 
-
-function UploadSVG() {
-    var svgSource = svg.outerHTML
-    var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
-
-    var fd = new FormData();
-    fd.append('username', userName)
-    fd.append('pagename', pageName)
-    fd.append('data', blob)
-    $.ajax({
-        type: 'POST',
-        url: 'http://127.0.0.1:8080/backend/page/upload',
-        data: fd,
-        processData: false,
-        contentType: false
-    }).done(function (data) {
-        // 服务器返回的数据
-        console.log(data)
-    })
-}
 
 // 鼠标相对于元素的位置
 function mousePos(node) {

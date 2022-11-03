@@ -21,7 +21,8 @@ type Register struct {
 
 type AddPage struct {
 	Status
-	PageIdx int64 `json:"page_idx"`
+	PageName string `json:"page_name"`
+	SvgPath  string `json:"svg_path"`
 }
 
 type Page struct {

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	v1 "qiniu/controller/api/v1"
 	"qiniu/ws"
+	"strings"
 )
 
 func InitRouter() *gin.Engine {
@@ -22,19 +23,23 @@ func InitRouter() *gin.Engine {
 
 	// 将指定目录挂在web
 	r.StaticFS("/public", http.Dir("../front_end/public"))
-
+	r.StaticFS("/data", http.Dir("./data"))
 	r.LoadHTMLFiles("../front_end/index.html")
 	r.GET("/qiniu", func(c *gin.Context) {
 		pageName := c.Query("page")
-		if len(pageName) == 0 {
+		userName := c.DefaultQuery("username", "unnamed")
+		// pageName 必须形如"username_pagename"
+		parts := strings.Split(pageName, "$")
+		if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "请求失败",
-				"msg":    "page is required~",
+				"msg":    "page format is not correct!~",
 			})
 			return
 		}
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"pageName": pageName,
+			"userName": userName,
 		})
 	})
 	// TODO

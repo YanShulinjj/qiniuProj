@@ -12,7 +12,7 @@ const (
 	ModeChangeType = 12
 )
 
-var DEBUG = false
+var DEBUG = true
 var IPMode = false
 var MaxClientNum = 128
 var MaxMessageNum = 128

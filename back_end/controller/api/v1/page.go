@@ -7,7 +7,6 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -29,9 +28,9 @@ func NewPageController() *pageController {
 func (*pageController) Add(c *gin.Context) {
 	username := c.Query("username")
 	pagename := c.DefaultQuery("pagename", "unnamed")
-	svgFileName, pageIdx, err := service.NewPage().Add(username, pagename)
+	svgPath, err := service.NewPage().Add(username, pagename)
 	if err != nil {
-		c.JSON(http.StatusNotFound, response.AddPage{
+		c.JSON(http.StatusOK, response.AddPage{
 			Status: response.Status{
 				xerr.ReuqestParamErr,
 				"添加页面出错！" + err.Error(),
@@ -39,14 +38,15 @@ func (*pageController) Add(c *gin.Context) {
 		})
 		return
 	}
-	// svgPath
-	svgPath := filepath.Join(config.C.SVGPATH, svgFileName)
-	// 保存到服务器
-	fmt.Println("Saving ....", svgPath)
+	// // svgPath
+	// svgPath := filepath.Join(config.C.SVGPATH, svgFileName)
+	// // 保存到服务器
+	// fmt.Println("Saving ....", svgPath)
 
 	c.JSON(http.StatusOK, response.AddPage{
-		Status:  response.Status{},
-		PageIdx: pageIdx,
+		Status:   response.Status{},
+		PageName: pagename,
+		SvgPath:  svgPath,
 	})
 }
 
@@ -89,7 +89,7 @@ func (*pageController) UploadSVG(c *gin.Context) {
 		return
 	}
 	// 保存到服务端
-	saveDir := filepath.Join("./data/svg/", username)
+	saveDir := filepath.Join(config.C.SVGPATH, username)
 
 	// 如果文件夹不存在
 	if _, err := os.Stat(saveDir); os.IsNotExist(err) {

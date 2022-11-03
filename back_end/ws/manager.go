@@ -14,7 +14,7 @@ import (
 
 // Manager 管理所有websocket 信息
 type Manager struct {
-	sync.Mutex
+	sync.RWMutex
 	PageName             string
 	AuthorId             string
 	ReadOnly             bool
@@ -121,4 +121,11 @@ func (m *Manager) Info() map[string]interface{} {
 	managerInfo["chanUnregisterLen"] = len(m.UnRegister)
 	managerInfo["chanBroadCastMessageLen"] = len(m.BroadCastMessage)
 	return managerInfo
+}
+
+func (m *Manager) IsExist(username string) bool {
+	m.RLock()
+	defer m.RUnlock()
+	_, ok := m.ClientMap[username]
+	return ok
 }

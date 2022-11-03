@@ -35,6 +35,8 @@ func (*userController) Register(c *gin.Context) {
 				xerr.ReuqestParamErr,
 				"注册用户出错",
 			},
+			UserID:   userId,
+			UserName: username,
 		})
 		return
 	}

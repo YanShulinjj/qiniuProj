@@ -46,7 +46,6 @@ func (c *Client) Read(m *Manager) {
 		if DEBUG {
 			log.Printf("client [%s] receive message: %s", c.Id, string(message))
 		}
-		// 反序列划
 		var msg Message
 		err = json.Unmarshal(message, &msg)
 		if err != nil {
@@ -56,7 +55,7 @@ func (c *Client) Read(m *Manager) {
 			log.Println(c.Id, " 接收到消息：", msg)
 		}
 		// 如果收到调整 读写模式
-		if msg.Type == ModeChangeType {
+		if c.Id == m.AuthorId && msg.Type == ModeChangeType {
 			m.ReadOnly = msg.Attr.(bool)
 		}
 		// 如果当前客户端是所有者
