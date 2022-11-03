@@ -9,8 +9,8 @@ package dao
 import (
 	"context"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"ws/config"
-	"ws/model"
+	"qiniu/config"
+	"qiniu/model"
 )
 
 type ServiceContext struct {
@@ -26,6 +26,7 @@ var ctx context.Context
 
 func init() {
 	svcCtx = newServiceContext(config.C)
+	ctx = context.Background()
 }
 
 func newServiceContext(c config.Config) *ServiceContext {

@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5809149",
+      "name": "查看",
+      "font_class": "qiniu-watch",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    },
+    {
+      "icon_id": "7239862",
+      "name": "redo",
+      "font_class": "qiniu-redo",
+      "unicode": "e749",
+      "unicode_decimal": 59209
+    },
+    {
+      "icon_id": "7239930",
+      "name": "undo",
+      "font_class": "qiniu-undo",
+      "unicode": "e75d",
+      "unicode_decimal": 59229
+    },
+    {
       "icon_id": "5809231",
       "name": "隐藏",
       "font_class": "qiniu-hidden",
@@ -53,13 +74,6 @@
       "font_class": "qiniu-eraser",
       "unicode": "e6ed",
       "unicode_decimal": 59117
-    },
-    {
-      "icon_id": "5387517",
-      "name": "撤销",
-      "font_class": "qiniu-undo",
-      "unicode": "eaf0",
-      "unicode_decimal": 60144
     },
     {
       "icon_id": "7789609",

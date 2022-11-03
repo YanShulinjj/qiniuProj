@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="396ad84a-8a7e-4729-8579-4e2c5729b8b9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/back_end/controller/api/v1/common.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/etc/config.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/pkg/name/name.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/router.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/ws/common.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/ws/handler.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/ws/managergroup.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front_end/public/js/pagelist.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front_end/public/js/server.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/front_end/public/js/ws.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/controller/api/response/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/controller/api/response/response.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/controller/api/v1/page.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/controller/api/v1/page.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/controller/api/v1/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/controller/api/v1/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/dao/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dao/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/dao/page.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dao/page.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/dao/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dao/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/go.sum" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/message_push.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/model/page.sql" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/model/page.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/model/pagemodel_gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/model/pagemodel_gen.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/model/usermodel.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/model/usermodel.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/model/usermodel_gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/model/usermodel_gen.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/pkg/svg/svg.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/pkg/svg/svg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/pkg/xerr/errCode.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/pkg/xerr/errCode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/service/page.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/service/page.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/service/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/service/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/ws/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/ws/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/ws/manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/ws/manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/css/iconfont.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/css/iconfont.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/css/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/css/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/font/iconfont.json" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/font/iconfont.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/font/iconfont.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/font/iconfont.ttf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/font/iconfont.woff" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/font/iconfont.woff" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/font/iconfont.woff2" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/font/iconfont.woff2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/js/hidden.js" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/js/hidden.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/js/iconfont.js" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/js/iconfont.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/js/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/js/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/js/link.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/public/js/text.js" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/public/js/text.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://E:/software/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2GtRm8cHtBu5K4NR1DlCmTK5RLO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.vendoring.notification.had.been.shown": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "F:/Speech/qiniu",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "RunConfigurationTargetLRU": [
+      "81c6a49a-86ed-4287-b8c6-74774a388f49"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\Speech\qiniu\back_end\ws" />
+      <recent name="F:\Speech\qiniu\back_end" />
+      <recent name="F:\Speech\qiniu\back_end\ws\internal" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Build.go build qiniu12">
+    <configuration name="page.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/back_end/model/page.sql" />
+      <script-mode>FILE</script-mode>
+      <data-source id="81c6a49a-86ed-4287-b8c6-74774a388f49" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build qiniu" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$/back_end" />
+      <kind value="PACKAGE" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/back_end/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build qiniu1" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$/back_end" />
+      <kind value="PACKAGE" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/back_end/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build qiniu12" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$/back_end" />
+      <kind value="PACKAGE" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/back_end/message_push.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build qiniu" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$/back_end" />
+      <kind value="PACKAGE" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/back_end/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build qiniu/ws" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$/back_end" />
+      <kind value="PACKAGE" />
+      <package value="qiniu/ws" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/back_end/ws/start.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="qiniu" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="qiniu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Database Script.page.sql" />
+      <item itemvalue="Go Build.go build qiniu1" />
+      <item itemvalue="Go Build.go build qiniu" />
+      <item itemvalue="Go Build.go build qiniu12" />
+      <item itemvalue="Go Build.go build qiniu/ws" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build qiniu12" />
+        <item itemvalue="Go Build.go build qiniu1" />
+        <item itemvalue="Go Build.go build qiniu" />
+        <item itemvalue="Go Build.go build qiniu" />
+        <item itemvalue="Database Script.page.sql" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="GoApplicationRunConfiguration">
+        <watch expression="ctx.ClientIP()" language="go" />
+        <watch expression="c.Query(&quot;username&quot;)" language="go" />
+        <watch expression="ctx.Request.Header.Get(&quot;X-Forwarded-For&quot;)" language="go" />
+        <watch expression="saveFile" language="go" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

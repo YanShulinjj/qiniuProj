@@ -7,9 +7,12 @@
 package service
 
 import (
+	"github.com/pkg/errors"
+	"qiniu/config"
+	"qiniu/dao"
+	"qiniu/pkg/svg"
+	xerr2 "qiniu/pkg/xerr"
 	"sync"
-	"ws/dao"
-	"ws/pkg/svg"
 )
 
 type pageService struct{}
@@ -29,25 +32,30 @@ func NewPage() *pageService {
 }
 
 // Add 指定用户新建一个page
-func (*pageService) Add(username string) (string, int64, error) {
+func (*pageService) Add(username, pagename string) (string, error) {
 	// 首先根据username获取userid和pageIdx
 	userid, pageIdx, err := dao.NewUser().Query(username)
 	if err != nil {
-		return "", 0, err
+		return "", err
+	}
+	// 为防止用户创建同名
+	if ok := dao.NewPage().QueryPageByName(userid, pagename); ok {
+		return "", errors.Wrapf(xerr2.NewErrCode(xerr2.PageExistedErr),
+			"page 已经存在, 不允许再次创建")
 	}
 	pageIdx += 1
 	// 生成一个svgPath路径
-	svgPath := svg.GenPath(userid, pageIdx)
-	_, err = dao.NewPage().Create(userid, pageIdx, svgPath)
+	svgPath := svg.GenPath(config.C.Host, config.C.Port, username, pagename)
+	_, err = dao.NewPage().Create(userid, pageIdx, pagename, svgPath)
 	if err != nil {
-		return "", 0, err
+		return "", err
 	}
 	// 更新pageNum
 	err = dao.NewUser().UpdatePageNum(username, pageIdx)
-	return svgPath, pageIdx, nil
+	return svgPath, nil
 }
 
-// Drop 指定用户新建一个page
+// Drop 删除指定用户的一个page
 func (*pageService) Drop(username string, pageIdx int64) (string, error) {
 	// 首先根据username获取userid
 	userid, _, err := dao.NewUser().Query(username)
@@ -60,4 +68,15 @@ func (*pageService) Drop(username string, pageIdx int64) (string, error) {
 	}
 	filename := svg.ParseFileName(avgPath)
 	return filename, err
+}
+
+func (*pageService) Query(username string) ([][]string, error) {
+	// 首先根据username获取userid
+	userid, _, err := dao.NewUser().Query(username)
+	if err != nil {
+		return nil, err
+	}
+
+	pages, err := dao.NewPage().QueryPages(userid)
+	return pages, err
 }

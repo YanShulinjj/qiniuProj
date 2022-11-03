@@ -1,0 +1,12 @@
+Name: qiniu-api
+Host: 127.0.0.1
+Port: :8080
+Mode: dev
+SVGPATH: ./data/svg
+Mysql:
+  DataSource: root:19990221@tcp(127.0.0.1:3306)/qiniu?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Type: node
+    Pass:

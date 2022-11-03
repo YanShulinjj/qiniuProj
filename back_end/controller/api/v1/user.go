@@ -9,9 +9,10 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"ws/controller/api/response"
-	"ws/pkg/xerr"
-	"ws/service"
+	"qiniu/controller/api/response"
+	"qiniu/pkg/name"
+	"qiniu/pkg/xerr"
+	"qiniu/service"
 )
 
 type userController struct{}
@@ -24,6 +25,9 @@ func NewUserController() *userController {
 
 func (*userController) Register(c *gin.Context) {
 	username := c.Query("username")
+	if username == "unnamed" {
+		username = name.GetDefaultName()
+	}
 	userId, err := service.NewUser().Add(username)
 	if err != nil {
 		c.JSON(http.StatusOK, response.Register{
@@ -31,11 +35,14 @@ func (*userController) Register(c *gin.Context) {
 				xerr.ReuqestParamErr,
 				"注册用户出错",
 			},
+			UserID:   userId,
+			UserName: username,
 		})
 		return
 	}
 	c.JSON(http.StatusOK, response.Register{
-		Status: response.Status{},
-		UserID: userId,
+		Status:   response.Status{},
+		UserID:   userId,
+		UserName: username,
 	})
 }

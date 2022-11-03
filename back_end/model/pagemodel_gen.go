@@ -22,15 +22,19 @@ var (
 	pageRowsExpectAutoSet   = strings.Join(stringx.Remove(pageFieldNames, "`page_id`", "`update_at`", "`updated_at`", "`update_time`", "`create_at`", "`created_at`", "`create_time`"), ",")
 	pageRowsWithPlaceHolder = strings.Join(stringx.Remove(pageFieldNames, "`page_id`", "`update_at`", "`updated_at`", "`update_time`", "`create_at`", "`created_at`", "`create_time`"), "=?,") + "=?"
 
-	cachePagePageIdPrefix        = "cache:page:pageId:"
-	cachePageUserIdPageIdxPrefix = "cache:page:userId:pageIdx:"
+	cachePagePageIdPrefix         = "cache:page:pageId:"
+	cachePageUserIdPageIdsPrefix  = "cache:page:userId:pageIds:"
+	cachePageUserIdPageIdxPrefix  = "cache:page:userId:pageIdx:"
+	cachePageUserIdPageNamePrefix = "cache:page:userId:pageName:"
 )
 
 type (
 	pageModel interface {
 		Insert(ctx context.Context, data *Page) (sql.Result, error)
 		FindOne(ctx context.Context, pageId int64) (*Page, error)
+		FindMany(ctx context.Context, userId int64) ([]*Page, error)
 		FindOneByUserIdPageIdx(ctx context.Context, userId int64, pageIdx int64) (*Page, error)
+		FindOneByUserIdPageName(ctx context.Context, userId int64, pageName string) (*Page, error)
 		Update(ctx context.Context, data *Page) error
 		Delete(ctx context.Context, pageId int64) error
 	}
@@ -43,7 +47,8 @@ type (
 	Page struct {
 		PageId     int64     `db:"page_id"`     // 页面ID
 		UserId     int64     `db:"user_id"`     // 用户id
-		PageIdx    int64     `db:"page_idx"`    // 已经存在的Page数量
+		PageIdx    int64     `db:"page_idx"`    // 用户的第idx个页面
+		PageName   string    `db:"page_name"`   // 页面别名
 		SvgPath    string    `db:"svg_path"`    // 页面svg文件路径
 		CreateTime time.Time `db:"create_time"` // 创建时间
 		UpdateTime time.Time `db:"update_time"` // 更新时间
@@ -65,10 +70,13 @@ func (m *defaultPageModel) Delete(ctx context.Context, pageId int64) error {
 
 	pagePageIdKey := fmt.Sprintf("%s%v", cachePagePageIdPrefix, pageId)
 	pageUserIdPageIdxKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageIdxPrefix, data.UserId, data.PageIdx)
+	pageUserIdPageIdsKey := fmt.Sprintf("%s%v", cachePageUserIdPageIdsPrefix, data.UserId)
+	pageUserIdPageNameKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageNamePrefix, data.UserId, data.PageName)
+
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `page_id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, pageId)
-	}, pagePageIdKey, pageUserIdPageIdxKey)
+	}, pagePageIdKey, pageUserIdPageIdxKey, pageUserIdPageIdsKey, pageUserIdPageNameKey)
 	return err
 }
 
@@ -82,6 +90,23 @@ func (m *defaultPageModel) FindOne(ctx context.Context, pageId int64) (*Page, er
 	switch err {
 	case nil:
 		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultPageModel) FindMany(ctx context.Context, userId int64) ([]*Page, error) {
+	pageUserIdPageIdsKey := fmt.Sprintf("%s%v", cachePageUserIdPageIdsPrefix, userId)
+	var resp []*Page
+	err := m.QueryRowCtx(ctx, &resp, pageUserIdPageIdsKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where `user_id` = ?", pageRows, m.table)
+		return conn.QueryRowsCtx(ctx, v, query, userId)
+	})
+	switch err {
+	case nil:
+		return resp, nil
 	case sqlc.ErrNotFound:
 		return nil, ErrNotFound
 	default:
@@ -109,13 +134,36 @@ func (m *defaultPageModel) FindOneByUserIdPageIdx(ctx context.Context, userId in
 	}
 }
 
+func (m *defaultPageModel) FindOneByUserIdPageName(ctx context.Context, userId int64, pageName string) (*Page, error) {
+	pageUserIdPageNameKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageNamePrefix, userId, pageName)
+	var resp Page
+	err := m.QueryRowIndexCtx(ctx, &resp, pageUserIdPageNameKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
+		query := fmt.Sprintf("select %s from %s where `user_id` = ? and `page_name` = ? limit 1", pageRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, userId, pageName); err != nil {
+			return nil, err
+		}
+		return resp.PageId, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultPageModel) Insert(ctx context.Context, data *Page) (sql.Result, error) {
 	pagePageIdKey := fmt.Sprintf("%s%v", cachePagePageIdPrefix, data.PageId)
 	pageUserIdPageIdxKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageIdxPrefix, data.UserId, data.PageIdx)
+	pageUserIdPageIdsKey := fmt.Sprintf("%s%v", cachePageUserIdPageIdsPrefix, data.UserId)
+	pageUserIdPageNameKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageNamePrefix, data.UserId, data.PageName)
+
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, pageRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.PageIdx, data.SvgPath)
-	}, pagePageIdKey, pageUserIdPageIdxKey)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, pageRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.PageIdx, data.PageName, data.SvgPath)
+	}, pagePageIdKey, pageUserIdPageIdxKey, pageUserIdPageIdsKey, pageUserIdPageNameKey)
 	return ret, err
 }
 
@@ -127,10 +175,12 @@ func (m *defaultPageModel) Update(ctx context.Context, newData *Page) error {
 
 	pagePageIdKey := fmt.Sprintf("%s%v", cachePagePageIdPrefix, data.PageId)
 	pageUserIdPageIdxKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageIdxPrefix, data.UserId, data.PageIdx)
+	pageUserIdPageIdsKey := fmt.Sprintf("%s%v", cachePageUserIdPageIdsPrefix, data.UserId)
+	pageUserIdPageNameKey := fmt.Sprintf("%s%v:%v", cachePageUserIdPageNamePrefix, data.UserId, data.PageName)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `page_id` = ?", m.table, pageRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.UserId, newData.PageIdx, newData.SvgPath, newData.PageId)
-	}, pagePageIdKey, pageUserIdPageIdxKey)
+		return conn.ExecCtx(ctx, query, newData.UserId, newData.PageIdx, newData.PageName, newData.SvgPath, newData.PageId)
+	}, pagePageIdKey, pageUserIdPageIdxKey, pageUserIdPageIdsKey, pageUserIdPageNameKey)
 	return err
 }
 

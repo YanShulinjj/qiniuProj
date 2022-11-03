@@ -8,9 +8,9 @@ package dao
 
 import (
 	"github.com/pkg/errors"
+	"qiniu/model"
+	xerr2 "qiniu/pkg/xerr"
 	"sync"
-	"ws/model"
-	xerr2 "ws/pkg/xerr"
 )
 
 type userDAO struct{}
@@ -34,8 +34,11 @@ func (u *userDAO) Create(username string) (int64, error) {
 	// 先判断，如果用户名已经存在，返回
 	user, err := svcCtx.UserModel.FindOneByUserIp(ctx, username)
 	if err == nil {
-		return 0, errors.Wrapf(xerr2.NewErrCode(xerr2.UserExistedErr),
-			"username 已经存在啦，user_id:%s,err:%v", user.UserId, err)
+		// return 0, errors.Wrapf(xerr2.NewErrCode(xerr2.UserExistedErr),
+		// 	"username 已经存在啦，user_id:%s,err:%v", user.UserId, err)
+
+		// 如果已经存在 直接返回userId
+		return user.UserId, nil
 	} else if err != model.ErrNotFound {
 		// 出现未知错误
 		return 0, err

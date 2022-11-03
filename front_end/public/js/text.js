@@ -47,26 +47,30 @@ window.createtext = function (localpoint, svg) {
 
     text.appendChild(textnode)
     svg.append(text)  // 插入svg
-    // let startPos = mousePos(svg)   // 获取鼠标相对svg的位置
-    //
-    // function drawEllipse() {
-    //     let currPos = mousePos(svg)
-    //     let cx = (startPos.x + currPos.x) / 2
-    //     let cy = (startPos.y + currPos.y) / 2
-    //     ellipse.setAttribute('cx', cx)
-    //     ellipse.setAttribute('cy', cy)
-    //     let rx = Math.abs(startPos.x - currPos.x) / 2
-    //     let ry = Math.abs(startPos.y - currPos.y) / 2
-    //     ellipse.setAttribute('rx', rx)
-    //     ellipse.setAttribute('ry', ry)
-    // }
-    //
-    // document.addEventListener('mousemove', drawEllipse)   // 持续运行
-    //
-    // document.addEventListener('mouseup', function once() {  // 解绑
-    //     document.removeEventListener('mouseup', once)
-    //     document.removeEventListener('mousemove', drawEllipse)
-    // })
+
+    // 将此操作加入队列
+    // 添加之前删除index 后面所有的elem
+    elementQueue.splice(index+1, elementQueue.length-index-1)
+    elementQueue.push({type: CommonType, value: text})
+    if (elementQueue.length > maxSize) {
+        // 移除队头
+        elementQueue.shift()
+    } else {
+        index ++
+    }
+    // 多人协作
+    let msg = {
+        type: TextType,
+        Attr: {
+            x: localpoint.x,
+            y: localpoint.y,
+            color: colorInput.value,
+            font_size: text.getAttribute('font-size'),
+            fillValue: text.getAttribute('fill'),
+            content: content
+        }
+    }
+    client.send(JSON.stringify(msg))
 }
 
 function elementMousedown(evt) {

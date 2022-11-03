@@ -1,3 +1,4 @@
+/* ----------------------- 变量定义区 -------------------------------- */
 let svgContainer = document.querySelector('div.svgContainer')
 let svg = document.querySelector('.svg')
 let svgparent = document.querySelector('.svgparent')
@@ -20,15 +21,17 @@ let widthInput = document.querySelector('input[type="range"]')  //笔画粗细
 let pen = document.querySelector('#icon-qiniu-huabi')
 let linear = document.querySelector('#icon-qiniu-line')
 let circle = document.querySelector('#icon-qiniu-ellipse')
-let rect = document.querySelector('#icon-qiniu-rectangle')
+let rect = document.querySelector('#icon-qiniu-square')
 let eraser = document.querySelector('#icon-qiniu-eraser')
-let roundrect = document.querySelector('#icon-qiniu-square')
+let roundrect = document.querySelector('#icon-qiniu-rectangle')
 let textedit = document.querySelector('#icon-qiniu-text')
 
 
 //按钮
 let addPage = document.querySelector('.add')
+let rwMode = document.querySelector('.rwMode')
 let undo = document.querySelector('.undo')
+let redo = document.querySelector('.redo')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -42,8 +45,51 @@ let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
 let ispagelist = false     // 定义是否点击了pagelist
 let mousedownonelement = false
+let readonly = false
+
+
+// type 编号
+const PolylineType = 0
+const DotType = 1
+const LineType = 2
+const CircleType = 3
+const RoundRectangleType = 4
+const RetangleType = 5
+const TextType = 6
+const UndoType = 7
+const RedoType = 8
+const ClearType = 9
+const LoadType = 10
+const CommonType = 11
+const ModeChangeType = 12
+const NeedSyncType = 13
+const InitializeType = 14
+
+// 记录各种图形的id
+let polylineNum = 1
+let ellipseNum = 1
+let rectangleNum = 1
+let lineNum = 1
+
+// 页面名称
+let saveFileName = 'xxxx.svg'
+
+// 用于撤销和反撤销
+let elementQueue = []
+let queueSize = 0
+let maxSize = 10
+let index = -1
+
+
+/* -----------------------事件定义区 -------------------------------- */
 
 svgContainer.addEventListener('mousedown', (e) => {
+
+    // 如果当前只读模式，并且登录者不是该页面的所有者
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     //背景色改变
     if (labelFill.contains(e.target)) {
         svgContainer.addEventListener('mouseup', (fillE) => {
@@ -113,6 +159,8 @@ svgContainer.addEventListener('mousedown', (e) => {
             let penStartPos = mousePos(svg)   // 拿到鼠标开始画的位置
             let polyline = document.createElementNS("http://www.w3.org/2000/svg", 'polyline')
             // 添加一堆Attribute
+            polyline.setAttribute("id", polylineNum)
+            polylineNum ++
             if (pen.checked){
                 // 当笔选中时
                 polyline.setAttribute('stroke', colorInput.value)
@@ -133,21 +181,56 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
 
             svg.append(polyline)
+
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: polyline})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
             console.log(2)
+
             let points = `${penStartPos.x} ${penStartPos.y} `   // 鼠标坐标
             polyline.setAttribute('points', points)   // 位置属性
 
+            // 多人协作
+            let msg = {
+                type: PolylineType,
+                Attr: {
+                    id: polyline.getAttribute('id'),
+                    points: polyline.getAttribute('points'),
+                    color: polyline.getAttribute('stroke'),
+                    stroke_width: polyline.getAttribute('stroke-width'),
+                    fillValue: polyline.getAttribute('fill')
+                }
+            }
+            client.send(JSON.stringify(msg))
+
+
             function drawDot(e) {   // 鼠标持续移动，持续触发这函数，持续画线
                 let penMovePos = mousePos(svg)
-                let line = document.createElementNS("http://www.w3.org/2000/svg", 'line')
+                // let line = document.createElementNS("http://www.w3.org/2000/svg", 'line')
                 points += `${penMovePos.x} ${penMovePos.y} `
                 polyline.setAttribute('points', points)
+                // 多人协作
+                let msg = {
+                    type: DotType,
+                    Attr: {
+                        id: polyline.getAttribute('id'),
+                        appendPoint: `${penMovePos.x} ${penMovePos.y} `
+                    }
+                }
+                client.send(JSON.stringify(msg))
             }
 
             svgContainer.addEventListener('mousemove', drawDot)
+            svgContainer.addEventListener('mouseup',  function onceDot(){
 
-            svgContainer.addEventListener('mouseup',  (once) => {
-                svgContainer.removeEventListener('mouseup', once)
+                svgContainer.removeEventListener('mouseup', onceDot)
                 svgContainer.removeEventListener('mousemove', drawDot)
             })
         }
@@ -159,6 +242,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             // 然后加一堆属性
             ellipse.setAttribute('stroke', colorInput.value)
             ellipse.setAttribute('stroke-width', widthInput.value)
+            ellipse.setAttribute('id', 'ellipse_' + ellipseNum)
             if (fillStart.checked){
                 ellipse.setAttribute('fill', fillColor.value)
             }else {
@@ -166,6 +250,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
 
             let startPos = mousePos(svg)   // 获取鼠标相对svg的位置
+
 
             function drawEllipse() {
                 let currPos = mousePos(svg)
@@ -177,11 +262,46 @@ svgContainer.addEventListener('mousedown', (e) => {
                 let ry = Math.abs(startPos.y - currPos.y) / 2
                 ellipse.setAttribute('rx', rx)
                 ellipse.setAttribute('ry', ry)
+                // 多人协作
+                let msg = {
+                    type: CircleType,
+                    Attr: {
+                        id: ellipseNum,
+                        cx: cx,
+                        cy: cy,
+                        rx: rx,
+                        ry: ry,
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        fillValue: ellipse.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
+            }
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: ellipse})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
             }
 
             document.addEventListener('mousemove', drawEllipse)   // 持续运行
 
             document.addEventListener('mouseup', function once() {  // 解绑
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: CircleType,
+                    Attr: {
+                        id: ellipseNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                ellipseNum ++
                 document.removeEventListener('mouseup', once)
                 document.removeEventListener('mousemove', drawEllipse)
             })
@@ -193,6 +313,7 @@ svgContainer.addEventListener('mousedown', (e) => {
             svg.append(rect)
             let rectStartPos = mousePos(svg)   // 鼠标位置
 
+            rect.setAttribute('id', 'rect_'+rectangleNum)
             rect.setAttribute('stroke', colorInput.value)
             rect.setAttribute('stroke-width', widthInput.value)
             rect.setAttribute('x', rectStartPos.x)
@@ -237,20 +358,60 @@ svgContainer.addEventListener('mousedown', (e) => {
                 rect.setAttribute('rx', rx)
                 rect.setAttribute('ry', ry)
 
-            }
-            svgContainer.addEventListener('mousemove', drawRect)
+                // 多人协作
+                let msg = {
+                    type: RetangleType,
+                    Attr: {
+                        id: rectangleNum,
+                        x: x,
+                        y: y,
+                        rx: rx,
+                        ry: ry,
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        width: width,
+                        height: height,
+                        fillValue: rect.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
 
-            svgContainer.addEventListener('mouseup', (rectE) => {
+            }
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: rect})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
+
+            svgContainer.addEventListener('mousemove', drawRect)
+            svgContainer.addEventListener('mouseup', function onceRect(){
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: RetangleType,
+                    Attr: {
+                        id: rectangleNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                rectangleNum ++
+                console.log("完成矩形勾画")
                 svgContainer.removeEventListener('mousemove', drawRect)
-                svgContainer.removeEventListener('mouseuo', rectE)
+                svgContainer.removeEventListener('mouseup', onceRect)
             })
+
         }
         // 直线
         if (linear.checked) {
             let linear = document.createElementNS("http://www.w3.org/2000/svg", 'line')
             svg.append(linear)
             let linearStartPos = mousePos(svg)
-
+            linear.setAttribute('id', 'line_'+lineNum)
             linear.setAttribute('stroke', colorInput.value)
             linear.setAttribute('stroke-width', widthInput.value)
             linear.setAttribute('stroke-linecap', 'round')
@@ -270,11 +431,49 @@ svgContainer.addEventListener('mousedown', (e) => {
 
                 linear.setAttribute('x2', linearStartPos.x + (linearMoverPos.x - linearStartPos.x)) // 鼠标初始位置加上终点位置减去起始位置
                 linear.setAttribute('y2', linearStartPos.y + (linearMoverPos.y - linearStartPos.y))
+
+                // 多人协作
+                let msg = {
+                    type: LineType,
+                    Attr: {
+                        id: lineNum,
+                        x1: linear.getAttribute('x1'),
+                        y1: linear.getAttribute('y1'),
+                        x2: linear.getAttribute('x2'),
+                        y2: linear.getAttribute('y2'),
+                        color: colorInput.value,
+                        stroke_width: widthInput.value,
+                        fillValue: linear.getAttribute('fill')
+                    }
+                }
+                client.send(JSON.stringify(msg))
+
             }
+            // 将此操作加入队列
+            // 添加之前删除index 后面所有的elem
+            elementQueue.splice(index+1, elementQueue.length-index-1)
+            elementQueue.push({type: CommonType, value: linear})
+            if (elementQueue.length > maxSize) {
+                // 移除队头
+                elementQueue.shift()
+            } else {
+                index ++
+            }
+
             svgContainer.addEventListener('mousemove', drawLinear)
 
-            svgContainer.addEventListener('mouseup', (linerE) => {
-                svgContainer.removeEventListener('mouseup', linerE)
+            svgContainer.addEventListener('mouseup', function onceLinear() {
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: LineType,
+                    Attr: {
+                        id: lineNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                lineNum++
+                svgContainer.removeEventListener('mouseup', onceLinear)
                 svgContainer.removeEventListener('mousemove', drawLinear)
             })
         }
@@ -288,11 +487,8 @@ svgContainer.addEventListener('mousedown', (e) => {
             }
         }
 
-
-
     }
 })
-
 
 
 // 点击显示pagelist
@@ -328,10 +524,28 @@ pagelist.addEventListener('click', (e) => {
 
 // 清除所画内容
 clear.addEventListener('click', (clickE) => {
+    // 将此操作加入队列
+    // 添加之前删除index 后面所有的elem
+    elementQueue.splice(index+1, elementQueue.length-index-1)
+    elementQueue.push({type: ClearType, value: svg.innerHTML})
+    if (elementQueue.length > maxSize) {
+        elementQueue.shift()
+    } else {
+        index ++
+    }
     svg.innerHTML = ''
+    // 多人协作
+    let msg = {
+        type: ClearType,
+    }
+    client.send(JSON.stringify(msg))
 })
 // 打开一个新文件
 openFile.addEventListener('click', function openLoaclFile () {
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     if (drawandnosave) {
         var answer = confirm('当前绘画未保存，确定要打开新文件吗？')
         if (answer == false) {
@@ -350,14 +564,52 @@ fileInput.addEventListener('change', e => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
         svg = document.querySelector('.svg')
+        let msg = {
+            type: LoadType,
+            Attr: {
+                content: svgFileContent
+            }
+        }
+        client.send(JSON.stringify(msg))
     })
     fr.readAsText(svgFile)
 })
 
-// 撤销
+// 撤销与反撤销
 document.addEventListener("keydown", function (event) {
-    if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
-        if (svg.lastChild) svg.lastChild.remove()
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
+    if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
+        // console.log("redo, ", index, elementQueue.length)
+        if (elementQueue.length > 0 && index < elementQueue.length-1) {
+            console.log("redo#, ", index, elementQueue.length)
+            index ++
+            if (elementQueue[index].type == CommonType) {
+                svg.append(elementQueue[index].value)
+            } else if (elementQueue[index].type == ClearType) {
+                svg.innerHTML = ''
+            }
+            let msg = {
+                type: RedoType,
+            }
+            client.send(JSON.stringify(msg))
+        }
+    } else if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
+        // 撤销
+        if (elementQueue.length > 0 && index >= 0) {
+            if (elementQueue[index].type == CommonType) {
+                svg.lastChild.remove()
+            } else if (elementQueue[index].type == ClearType) {
+                svg.innerHTML = elementQueue[index].value
+            }
+            index --
+            let msg = {
+                type: UndoType,
+            }
+            client.send(JSON.stringify(msg))
+        }
     }
 })
 
@@ -378,21 +630,75 @@ saveFile.addEventListener('click' ,function save(){
     var url = URL.createObjectURL(blob)
     var anchor = document.createElement("a")
     anchor.href = url
-    anchor.download = "xxxx.svg"
+    anchor.download = saveFileName
     anchor.click()  // 点击button 也触发a标签点击
+
+    // 发起POST请求
+    UploadSVG()
     // TODO：持久化此页面
 })
 addPage.addEventListener("click", function add(){
     // TODO: 添加新页面
     console.log("点击了add")
+    content=prompt("请输入页面名称：");
+    console.log(content);//4
+    // 如果取消 直接返回
+    if (content == null) {
+        return
+    }
+    // 发起addpage请求
+    AddPage(content)
+
 })
 
 // 撤销上一步
 undo.addEventListener("click", function (e) {
-    if (svg.lastChild) svg.lastChild.remove()
+    if (elementQueue.length > 0 && index >= 0) {
+        if (elementQueue[index].type == CommonType) {
+            svg.lastChild.remove()
+        } else if (elementQueue[index].type == ClearType) {
+            svg.innerHTML = elementQueue[index].value
+        }
+        index --
+        let msg = {
+            type: UndoType,
+        }
+        client.send(JSON.stringify(msg))
+    }
 })
 
 // TODO redo
+redo.addEventListener("click", function (e) {
+    if (elementQueue.length > 0 && index < elementQueue.length-1) {
+        index ++
+        if (elementQueue[index].type == CommonType) {
+            svg.append(elementQueue[index].value)
+        } else if (elementQueue[index].type == ClearType) {
+            svg.innerHTML = ''
+        }
+        let msg = {
+            type: RedoType,
+        }
+        client.send(JSON.stringify(msg))
+    }
+})
+
+// TODO rwMode
+rwMode.addEventListener("click", function (e){
+    readonly = !readonly
+    // 将按钮图标更换
+    if (readonly) {
+        document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
+    } else {
+        document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
+    }
+    let msg = {
+        type: ModeChangeType,
+        Attr: readonly,
+    }
+    client.send(JSON.stringify(msg))
+})
+
 
 // 鼠标相对于元素的位置
 function mousePos(node) {

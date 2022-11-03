@@ -341,7 +341,7 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
     box-shadow:3px 1px 5px 0px #6988e17a;
 }
 .addundobar {
-    width: 400px;
+    width: 440px;
     height: 60px;
     left: 50%;
     border: 2px solid rgb(255, 255, 255);
