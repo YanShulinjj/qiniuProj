@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"qiniu/config"
 	v1 "qiniu/controller/api/v1"
 	"qiniu/ws"
 	"strings"
@@ -40,6 +41,7 @@ func InitRouter() *gin.Engine {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"pageName": pageName,
 			"userName": userName,
+			"hostAddr": config.C.Host + config.C.Port,
 		})
 	})
 	// TODO

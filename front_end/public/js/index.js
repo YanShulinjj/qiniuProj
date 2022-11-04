@@ -25,6 +25,7 @@ let rect = document.querySelector('#icon-qiniu-square')
 let eraser = document.querySelector('#icon-qiniu-eraser')
 let roundrect = document.querySelector('#icon-qiniu-rectangle')
 let textedit = document.querySelector('#icon-qiniu-text')
+let tips = document.querySelector(".tips")
 
 
 //按钮
@@ -583,6 +584,7 @@ document.addEventListener("keydown", function (event) {
     }
     if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
         // console.log("redo, ", index, elementQueue.length)
+        showtips("Redo")
         if (elementQueue.length > 0 && index < elementQueue.length-1) {
             console.log("redo#, ", index, elementQueue.length)
             index ++
@@ -598,6 +600,7 @@ document.addEventListener("keydown", function (event) {
         }
     } else if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
         // 撤销
+        showtips("Undo")
         if (elementQueue.length > 0 && index >= 0) {
             if (elementQueue[index].type == CommonType) {
                 svg.lastChild.remove()
@@ -615,10 +618,10 @@ document.addEventListener("keydown", function (event) {
 
 // 下面是退出浏览器提示
 window.onbeforeunload = function () {
-  if (drawandnosave) {
-      // TODO: 持久化此页面
-      console.log("点击了退出按钮")
-  }
+    if (drawandnosave) {
+        // TODO: 持久化此页面
+        console.log("点击了退出按钮")
+    }
 }
 
 // 将图画保存到桌面

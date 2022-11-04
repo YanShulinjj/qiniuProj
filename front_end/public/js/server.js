@@ -1,4 +1,6 @@
 let userId = 0
+let HostAddr = document.getElementById("hostAddr").innerText
+
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
 let pageAuthorName = pageName.split('$')[0]
@@ -8,7 +10,7 @@ GetUserInfo()
 
 
 function AddPage(newPageName) {
-    var url = 'http://127.0.0.1:8080/backend/page/add?username='+userName+'&pagename='+newPageName
+    var url = "http://"+HostAddr+'/backend/page/add?username='+userName+'&pagename='+newPageName
     $.ajax({
         type: 'GET',
         url: url,
@@ -29,7 +31,7 @@ function AddPage(newPageName) {
 }
 
 function GetUserInfo() {
-    var url = 'http://127.0.0.1:8080/backend/user/add?username='+userName
+    var url = "http://"+HostAddr+'/backend/user/add?username='+userName
     $.ajax({
         type: 'GET',
         url: url,
@@ -48,7 +50,7 @@ function GetUserInfo() {
 }
 
 function GetPageList() {
-    var url = 'http://127.0.0.1:8080/backend/page/list?username=' + userName
+    var url = "http://"+HostAddr+'/backend/page/list?username=' + userName
     $.ajax({
         type: 'GET',
         url: url,
@@ -94,7 +96,7 @@ function UploadSVG() {
     fd.append('data', blob)
     $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1:8080/backend/page/upload',
+        url: "http://"+HostAddr+'/backend/page/upload',
         data: fd,
         processData: false,
         contentType: false
