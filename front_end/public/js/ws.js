@@ -1,6 +1,6 @@
 // 客户端与服务端建立websocket链接
 function ws () {
-    client = new WebSocket("ws://127.0.0.1:8080/ws/wedraw?username="+userName+"&page="+pageName);    //连接服务器
+    client = new WebSocket("ws://"+HostAddr+"/ws/wedraw?username="+userName+"&page="+pageName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -235,7 +235,7 @@ function ws () {
 }
 
 function syncws() {
-    syncclient = new WebSocket("ws://127.0.0.1:8080/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
+    syncclient = new WebSocket("ws://"+HostAddr+"/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
