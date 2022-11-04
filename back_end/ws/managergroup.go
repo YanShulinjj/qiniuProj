@@ -14,6 +14,7 @@ type ManagerGroup struct {
 }
 
 var defaultMangerGroup = NewMangerGroup()
+var syncMangerGroup = NewMangerGroup()
 
 func NewMangerGroup() *ManagerGroup {
 	return &ManagerGroup{

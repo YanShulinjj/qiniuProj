@@ -54,6 +54,7 @@ func InitRouter() *gin.Engine {
 	wsGroup := r.Group("/ws")
 	{
 		wsGroup.GET("/wedraw", ws.WSHandler) // 每一个访问都会调用该路由对应的方法
+		wsGroup.GET("/statue", ws.SyncHandler)
 	}
 
 	return r

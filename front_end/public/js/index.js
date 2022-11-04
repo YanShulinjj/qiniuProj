@@ -62,6 +62,8 @@ const ClearType = 9
 const LoadType = 10
 const CommonType = 11
 const ModeChangeType = 12
+const NeedSyncType = 13
+const InitializeType = 14
 
 // 记录各种图形的id
 let polylineNum = 1
@@ -82,6 +84,12 @@ let index = -1
 /* -----------------------事件定义区 -------------------------------- */
 
 svgContainer.addEventListener('mousedown', (e) => {
+
+    // 如果当前只读模式，并且登录者不是该页面的所有者
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     //背景色改变
     if (labelFill.contains(e.target)) {
         svgContainer.addEventListener('mouseup', (fillE) => {
@@ -382,19 +390,19 @@ svgContainer.addEventListener('mousedown', (e) => {
 
             svgContainer.addEventListener('mousemove', drawRect)
             svgContainer.addEventListener('mouseup', function onceRect(){
-                    // 多人协作, 发送结束标记
-                    let msg = {
-                        type: RetangleType,
-                        Attr: {
-                            id: rectangleNum,
-                            isEnd: true,
-                        },
-                    }
-                    client.send(JSON.stringify(msg))
-                    rectangleNum ++
-                    console.log("完成矩形勾画")
-                    svgContainer.removeEventListener('mousemove', drawRect)
-                    svgContainer.removeEventListener('mouseup', onceRect)
+                // 多人协作, 发送结束标记
+                let msg = {
+                    type: RetangleType,
+                    Attr: {
+                        id: rectangleNum,
+                        isEnd: true,
+                    },
+                }
+                client.send(JSON.stringify(msg))
+                rectangleNum ++
+                console.log("完成矩形勾画")
+                svgContainer.removeEventListener('mousemove', drawRect)
+                svgContainer.removeEventListener('mouseup', onceRect)
             })
 
         }
@@ -534,6 +542,10 @@ clear.addEventListener('click', (clickE) => {
 })
 // 打开一个新文件
 openFile.addEventListener('click', function openLoaclFile () {
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     if (drawandnosave) {
         var answer = confirm('当前绘画未保存，确定要打开新文件吗？')
         if (answer == false) {
@@ -565,6 +577,10 @@ fileInput.addEventListener('change', e => {
 
 // 撤销与反撤销
 document.addEventListener("keydown", function (event) {
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
         // console.log("redo, ", index, elementQueue.length)
         if (elementQueue.length > 0 && index < elementQueue.length-1) {
@@ -581,13 +597,6 @@ document.addEventListener("keydown", function (event) {
             client.send(JSON.stringify(msg))
         }
     } else if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
-        // if (svg.lastChild) {
-        //     svg.lastChild.remove()
-        //     let msg = {
-        //         type: UndoType,
-        //     }
-        //     client.send(JSON.stringify(msg))
-        // }
         // 撤销
         if (elementQueue.length > 0 && index >= 0) {
             if (elementQueue[index].type == CommonType) {
@@ -618,11 +627,11 @@ saveFile.addEventListener('click' ,function save(){
 
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
-    // var url = URL.createObjectURL(blob)
-    // var anchor = document.createElement("a")
-    // anchor.href = url
-    // anchor.download = saveFileName
-    // anchor.click()  // 点击button 也触发a标签点击
+    var url = URL.createObjectURL(blob)
+    var anchor = document.createElement("a")
+    anchor.href = url
+    anchor.download = saveFileName
+    anchor.click()  // 点击button 也触发a标签点击
 
     // 发起POST请求
     UploadSVG()

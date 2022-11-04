@@ -1,6 +1,7 @@
 let userId = 0
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
+let pageAuthorName = pageName.split('$')[0]
 let pages  = []
 
 GetUserInfo()
@@ -40,7 +41,8 @@ function GetUserInfo() {
         userName = data.user_name
         userId = data.user_id
         console.log(userId)
-        ws ()  // 直接建立websocket连接
+        syncws() //
+        ws ()   // 直接建立websocket连接
         GetPageList()
     })
 }
@@ -79,6 +81,10 @@ function UpdatePageList(pages) {
 }
 
 function UploadSVG() {
+    if (readonly && userName != pageAuthorName) {
+        console.log("只读模式、禁止修改")
+        return
+    }
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
 

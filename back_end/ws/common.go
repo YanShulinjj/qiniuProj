@@ -10,6 +10,7 @@ const (
 	ReadWriteAllow = iota
 	ReadOnly
 	ModeChangeType = 12
+	NeedSyncType   = 13
 )
 
 var DEBUG = true

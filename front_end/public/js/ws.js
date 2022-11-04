@@ -208,8 +208,15 @@ function ws () {
                 readonly = msg.Attr
                 // 将按钮图标更换
                 if (readonly) {
+                    if (pageAuthorName != userName) {
+                        // 直接隐藏
+                        hiddenElems()
+                    }
                     document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
                 } else {
+                    if (pageAuthorName != userName) {
+                        displayElems()
+                    }
                     document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
                 }
                 break
@@ -227,3 +234,53 @@ function ws () {
     };
 }
 
+function syncws() {
+    syncclient = new WebSocket("ws://127.0.0.1:8080/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
+    // client.onopen = function(e){
+    //     alert('连接服务器成功！');
+    // };
+
+    // 从服务器接收数据
+    syncclient.onmessage = function (e) {
+        let data = e.data
+        let msg = JSON.parse(data)
+        console.log(" ***** 接受到的消息：" + data)
+        if (msg.type == NeedSyncType) {
+            // 发送自己面板上的全部元素
+            syncMsg()
+        } else if (msg.type == InitializeType) {
+            svg.innerHTML = msg.Attr.content
+            // 为了实现能够同步undo,redo功能
+            // 需要将末尾N个入队列
+            startIdx = svg.children.length - maxSize < 0? 0: svg.children.length - maxSize
+            for (i=startIdx; i<svg.children.length; i++) {
+                elementQueue.push({type: CommonType, value: svg.children[i]})
+                index ++
+            }
+            console.log("Queue:", elementQueue)
+
+            // 如果不是作者，关闭连接
+            if (pageAuthorName != userName) {
+                syncclient.close()
+            }
+        } else {
+            console.log("不支持的消息类型")
+        }
+
+    }
+}
+
+function syncMsg() {
+    // 如果是作者
+    // 发送同步消息
+    if (pageAuthorName == userName) {
+        let syncmsg = {
+            type: InitializeType,
+            Attr: {
+                content: svg.innerHTML
+            }
+        }
+        console.log("send syncmsg")
+        syncclient.send(JSON.stringify(syncmsg))
+    }
+}

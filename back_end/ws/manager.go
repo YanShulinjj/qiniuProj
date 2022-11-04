@@ -22,6 +22,7 @@ type Manager struct {
 	clientCount          uint
 	Register, UnRegister chan *Client
 	BroadCastMessage     chan *BroadCastMessageData
+	LastMessage          *BroadCastMessageData
 }
 
 func NewManager(pageName, authorId string) *Manager {
@@ -43,26 +44,18 @@ func (m *Manager) WriteToAll() {
 		select {
 		case data, ok := <-m.BroadCastMessage:
 			if !ok {
-				log.Println("没有取到广播数据。")
+				log.Printf("[%s]没有取到广播数据。\n", m.PageName)
 			}
 			for _, client := range m.ClientMap {
 				sender, ok := m.ClientMap[data.Id]
-
-				// 绘图数据不会发给自己，如果这里是将绘图数据写给客户端，应该跳过正在绘图的人
-				if sender.Id == client.Id {
-					continue
+				if !ok || sender.Id != client.Id {
+					client.Lock()
+					client.Conn.WriteMessage(websocket.TextMessage, data.Message)
+					client.Unlock()
 				}
-
-				if !ok {
-					log.Println("用户不存在") // 这里应该是存在的，先判断一下
-				}
-
-				client.Lock()
-				client.Conn.WriteMessage(websocket.TextMessage, data.Message)
-				client.Unlock()
 			}
 			if DEBUG {
-				log.Println("广播数据：", data.Message)
+				log.Printf("[%s]广播数据: %v\n", m.PageName, data.Message)
 			}
 		}
 	}

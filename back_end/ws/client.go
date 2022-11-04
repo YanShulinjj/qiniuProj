@@ -25,11 +25,11 @@ func (c *Client) Read(m *Manager) {
 	defer func() {
 		m.UnRegister <- c
 		if DEBUG {
-			log.Printf("client [%s] disconnect", c.Id)
+			log.Printf("[%s]client [%s] disconnect\n", m.PageName, c.Id)
 		}
 		if err := c.Conn.Close(); err != nil {
 			if DEBUG {
-				log.Printf("client [%s] disconnect err: %s", c.Id, err)
+				log.Printf("[%s]client [%s] disconnect err: %s\n", m.PageName, c.Id, err)
 			}
 		}
 	}()
@@ -39,20 +39,21 @@ func (c *Client) Read(m *Manager) {
 		if err != nil || messageType == websocket.CloseMessage {
 			// 读取完毕
 			if DEBUG {
-				log.Println(err)
+				log.Printf("[%s]%s\n", m.PageName, err)
 			}
 			break
 		}
 		if DEBUG {
-			log.Printf("client [%s] receive message: %s", c.Id, string(message))
+			log.Printf("[%s]client [%s] receive message: %s\n", m.PageName, c.Id, string(message))
 		}
 		var msg Message
 		err = json.Unmarshal(message, &msg)
 		if err != nil {
-			log.Fatalln(err)
+			log.Printf("[%s]%s\n", m.PageName, err)
 		}
 		if DEBUG {
-			log.Println(c.Id, " 接收到消息：", msg)
+			log.Printf("[%s] client: %s 接收到消息：%s\n",
+				m.PageName, c.Id, message)
 		}
 		// 如果收到调整 读写模式
 		if c.Id == m.AuthorId && msg.Type == ModeChangeType {
