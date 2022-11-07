@@ -1,6 +1,6 @@
 // 客户端与服务端建立websocket链接
 function ws () {
-    client = new WebSocket("ws://127.0.0.1:8080/ws/wedraw?username="+userName+"&page="+pageName);    //连接服务器
+    client = new WebSocket("ws://"+HostAddr+"/ws/wedraw?username="+userName+"&page="+pageName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -235,7 +235,7 @@ function ws () {
 }
 
 function syncws() {
-    syncclient = new WebSocket("ws://127.0.0.1:8080/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
+    syncclient = new WebSocket("ws://"+HostAddr+"/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -245,12 +245,20 @@ function syncws() {
         let data = e.data
         let msg = JSON.parse(data)
         console.log(" ***** 接受到的消息：" + data)
-
         if (msg.type == NeedSyncType) {
             // 发送自己面板上的全部元素
             syncMsg()
         } else if (msg.type == InitializeType) {
             svg.innerHTML = msg.Attr.content
+            // 为了实现能够同步undo,redo功能
+            // 需要将末尾N个入队列
+            startIdx = svg.children.length - maxSize < 0? 0: svg.children.length - maxSize
+            for (i=startIdx; i<svg.children.length; i++) {
+                elementQueue.push({type: CommonType, value: svg.children[i]})
+                index ++
+            }
+            console.log("Queue:", elementQueue)
+
             // 如果不是作者，关闭连接
             if (pageAuthorName != userName) {
                 syncclient.close()

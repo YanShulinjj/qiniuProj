@@ -125,8 +125,11 @@ func (p *pageDAO) Drop(userId, pageIdx int64) (string, error) {
 }
 
 // QueryPageByName 查询指定的userid和pageName 是否存在
-func (p *pageDAO) QueryPageByName(userId int64, pageName string) bool {
+func (p *pageDAO) QueryPageByName(userId int64, pageName string) (string, bool) {
 	// 查询page是否存在
-	_, err := svcCtx.PageModel.FindOneByUserIdPageName(ctx, userId, pageName)
-	return err == nil
+	page, err := svcCtx.PageModel.FindOneByUserIdPageName(ctx, userId, pageName)
+	if err != nil {
+		return "", false
+	}
+	return page.SvgPath, true
 }

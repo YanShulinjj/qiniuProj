@@ -7,11 +7,12 @@
     <title>qiniu画板</title>
     <link rel="stylesheet" href="public/css/iconfont.css">
     <link rel="stylesheet" href="public/css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>-->
 
     <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 </head>
 <body>
+    <p id = "hostAddr" style="display: none">{{.hostAddr}}</p>
     <p id = "pageName" style="display: none">{{.pageName}}</p>
     <p id = "userName" style="display: none">{{.userName}}</p>
     <div class="svgContainer">
@@ -107,6 +108,11 @@
             </div>
         </div>
         <!-- 顶部按钮 结束 -->
+
+        <!-- 提示框  -->
+        <div class="tips">
+            Tips
+        </div>
 
         <!-- 画板中心：构造图形-->
         <div class="svgparent">

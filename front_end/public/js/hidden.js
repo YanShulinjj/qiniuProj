@@ -42,3 +42,13 @@ function displayElems() {
     document.getElementsByClassName("addundobar")[0].style.width = "400px"
 
 }
+
+
+function showtips(text) {
+    // 先将tips中的文本替换
+
+    tips.innerHTML = text
+    tips.style.display = "block"
+
+    $(".tips").fadeOut(300);
+}

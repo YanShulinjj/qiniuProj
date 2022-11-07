@@ -1,14 +1,18 @@
 let userId = 0
+let HostAddr = document.getElementById("hostAddr").innerText
+
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
 let pageAuthorName = pageName.split('$')[0]
 let pages  = []
 
+// let DATA
+
 GetUserInfo()
 
 
 function AddPage(newPageName) {
-    var url = 'http://127.0.0.1:8080/backend/page/add?username='+userName+'&pagename='+newPageName
+    var url = "http://"+HostAddr+'/backend/page/add?username='+userName+'&pagename='+newPageName
     $.ajax({
         type: 'GET',
         url: url,
@@ -29,7 +33,7 @@ function AddPage(newPageName) {
 }
 
 function GetUserInfo() {
-    var url = 'http://127.0.0.1:8080/backend/user/add?username='+userName
+    var url = "http://"+HostAddr+'/backend/user/add?username='+userName
     $.ajax({
         type: 'GET',
         url: url,
@@ -41,6 +45,7 @@ function GetUserInfo() {
         userName = data.user_name
         userId = data.user_id
         console.log(userId)
+        InitPage()
         syncws() //
         ws ()   // 直接建立websocket连接
         GetPageList()
@@ -48,7 +53,7 @@ function GetUserInfo() {
 }
 
 function GetPageList() {
-    var url = 'http://127.0.0.1:8080/backend/page/list?username=' + userName
+    var url = "http://"+HostAddr+'/backend/page/list?username=' + userName
     $.ajax({
         type: 'GET',
         url: url,
@@ -94,12 +99,43 @@ function UploadSVG() {
     fd.append('data', blob)
     $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1:8080/backend/page/upload',
+        url: "http://"+HostAddr+'/backend/page/upload',
         data: fd,
         processData: false,
         contentType: false
     }).done(function (data) {
         // 服务器返回的数据
         console.log(data)
+    })
+}
+
+function InitPage() {
+    var url = "http://"+HostAddr+'/backend/page/get?username='+pageAuthorName+'&pagename='+pageName
+    $.ajax({
+        type: 'GET',
+        url: url,
+        processData: false,
+        contentType: false
+    }).done(function (data) {
+        // 服务器返回的数据
+        console.log(data)
+        if (data.status_code == 0) {
+            var svgpath = data.svg_path
+            $.ajax({
+                type: 'GET',
+                url: svgpath,
+                processData: false,
+                contentType: false
+            }).done(function (data) {
+                // 服务器返回的数据
+                // console.log(data)
+                svgparent.innerHTML = data.firstChild.outerHTML
+                svg = document.querySelector('.svg')
+                // DATA = data
+            })
+
+        } else {
+            alert("该页面还未创建！")
+        }
     })
 }

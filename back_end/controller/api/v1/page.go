@@ -53,7 +53,7 @@ func (*pageController) Add(c *gin.Context) {
 func (*pageController) PageList(c *gin.Context) {
 	username := c.Query("username")
 
-	pages, err := service.NewPage().Query(username)
+	pages, err := service.NewPage().QueryMany(username)
 	if err != nil {
 		c.JSON(http.StatusNotFound, response.PageList{
 			Status: response.Status{
@@ -115,4 +115,26 @@ func (*pageController) UploadSVG(c *gin.Context) {
 		"ok",
 	})
 
+}
+
+// GetPage 根据用户和pagename 获取svgpath
+func (*pageController) GetPage(c *gin.Context) {
+	username := c.Query("username")
+	pagename := c.Query("pagename")
+
+	path, err := service.NewPage().QueryOne(username, pagename)
+	if err != nil {
+		c.JSON(http.StatusOK, response.Status{
+			xerr.ReuqestParamErr,
+			"获取page错误，" + err.Error(),
+		})
+		return
+	}
+	//
+	c.JSON(http.StatusOK, response.PageInfo{
+		Page: response.Page{
+			PageName: pagename,
+			SvgPath:  "http://" + path,
+		},
+	})
 }
