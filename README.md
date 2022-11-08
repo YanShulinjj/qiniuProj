@@ -28,5 +28,5 @@
    go run main.go
      ```
   
-  3. 浏览器输入地址 127.0.0.1:8080/qiniu?username=u1&pagename=u1$p1
+  3.  使用分享的链接
 
