@@ -1,9 +1,8 @@
 let userId = 0
 let HostAddr = document.getElementById("hostAddr").innerText
-
+let pageAuthorName = document.getElementById("authorName").innerText
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
-let pageAuthorName = pageName.split('$')[0]
 let pages  = []
 
 // let DATA
@@ -46,7 +45,7 @@ function GetUserInfo() {
         userId = data.user_id
         console.log(userId)
         InitPage()
-        syncws() //
+
         ws ()   // 直接建立websocket连接
         GetPageList()
     })
@@ -78,7 +77,7 @@ function UpdatePageList(pages) {
     for (i =0; i< pages.length; i++) {
         var li = document.createElement("li")
         a = document.createElement("a")
-        a.href = "/qiniu?username="+userName+"&page="+userName+'$'+ pages[i].page_name
+        a.href = "/qiniu?username="+userName+"&page="+pages[i].page_name
         a.innerHTML = pages[i].page_name
         li.insertBefore(a, null)
         ul.insertBefore(li, ul.lastChild)
@@ -131,7 +130,10 @@ function InitPage() {
                 // console.log(data)
                 svgparent.innerHTML = data.firstChild.outerHTML
                 svg = document.querySelector('.svg')
+                // 设置多个图形的ID
                 // DATA = data
+                LoadIds()
+                syncws() //
             })
 
         } else {

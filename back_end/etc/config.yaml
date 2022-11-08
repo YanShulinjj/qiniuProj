@@ -1,5 +1,5 @@
 Name: qiniu-api
-Host: 127.0.0.1
+Host: 218.194.44.211
 Port: :8080
 Mode: dev
 SVGPATH: ./data/svg

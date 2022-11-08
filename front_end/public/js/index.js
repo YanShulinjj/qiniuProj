@@ -33,6 +33,7 @@ let addPage = document.querySelector('.add')
 let rwMode = document.querySelector('.rwMode')
 let undo = document.querySelector('.undo')
 let redo = document.querySelector('.redo')
+let share = document.querySelector('.share')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -565,6 +566,7 @@ fileInput.addEventListener('change', e => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
         svg = document.querySelector('.svg')
+        LoadIds()
         let msg = {
             type: LoadType,
             Attr: {
@@ -691,6 +693,18 @@ redo.addEventListener("click", function (e) {
     }
 })
 
+// 生成链接
+share.addEventListener("click", function (e){
+    console.log("share click")
+    let area = document.createElement("textarea")
+    area.innerHTML = "http://" + HostAddr + "/qiniu?username="+userName+"&page="+pageName+"&author="+pageAuthorName
+    document.body.appendChild(area)
+    area.select()
+    document.execCommand("Copy")
+    document.body.removeChild(area)
+    var r=confirm("分享链接已经复制到粘贴板上啦");
+})
+
 // TODO rwMode
 rwMode.addEventListener("click", function (e){
     readonly = !readonly
@@ -738,4 +752,36 @@ String.prototype.colorHex = function () {
     } else {
         return String(color);
     }
+}
+
+// 更加当前svg的所有元素，设置各个图形的id起始
+// 主要用于加载图形后使用
+function LoadIds() {
+    for (i = 0; i < svg.children.length; i++) {
+        var tag = svg.children[i].nodeName
+        var id = svg.children[i].getAttribute("id")
+        console.log("LoadIds:", tag, id)
+
+        if (tag == 'polyline') {
+            polylineNum = max(polylineNum, parseInt(id))
+        } else if (tag == 'ellipse') {
+
+            ellipseNum = max(ellipseNum, id.split('_')[1])
+        } else if (tag == 'rectangle') {
+            rectangleNum = max(rectangleNum, id.split('_')[1])
+        } else if (tag == 'line') {
+            lineNum = max(lineNum, id.split('_')[1])
+        }
+    }
+    polylineNum ++
+    ellipseNum ++
+    rectangleNum ++
+    lineNum ++
+}
+
+function max(a, b) {
+    if (a > b) {
+        return a
+    }
+    return b
 }
