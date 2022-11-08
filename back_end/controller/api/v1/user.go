@@ -24,7 +24,7 @@ func NewUserController() *userController {
 }
 
 func (*userController) Register(c *gin.Context) {
-	username := c.Query("username")
+	username := c.DefaultQuery("username", "unnamed")
 	if username == "unnamed" {
 		username = name.GetDefaultName()
 	}

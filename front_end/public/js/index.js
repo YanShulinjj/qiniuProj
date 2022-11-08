@@ -25,6 +25,7 @@ let rect = document.querySelector('#icon-qiniu-square')
 let eraser = document.querySelector('#icon-qiniu-eraser')
 let roundrect = document.querySelector('#icon-qiniu-rectangle')
 let textedit = document.querySelector('#icon-qiniu-text')
+let tips = document.querySelector(".tips")
 
 
 //按钮
@@ -564,6 +565,7 @@ fileInput.addEventListener('change', e => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
         svg = document.querySelector('.svg')
+        LoadIds()
         let msg = {
             type: LoadType,
             Attr: {
@@ -581,8 +583,14 @@ document.addEventListener("keydown", function (event) {
         console.log("只读模式、禁止修改")
         return
     }
-    if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
+    if (event.code == 'KeyS' && event.shiftKey) {
+        // 保存页面
+        UploadSVG()
+        showtips("Save")
+
+    }else if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
         // console.log("redo, ", index, elementQueue.length)
+        showtips("Redo")
         if (elementQueue.length > 0 && index < elementQueue.length-1) {
             console.log("redo#, ", index, elementQueue.length)
             index ++
@@ -598,6 +606,7 @@ document.addEventListener("keydown", function (event) {
         }
     } else if (event.code == "KeyZ" && (event.ctrlKey || event.metaKey)) {
         // 撤销
+        showtips("Undo")
         if (elementQueue.length > 0 && index >= 0) {
             if (elementQueue[index].type == CommonType) {
                 svg.lastChild.remove()
@@ -615,10 +624,10 @@ document.addEventListener("keydown", function (event) {
 
 // 下面是退出浏览器提示
 window.onbeforeunload = function () {
-  if (drawandnosave) {
-      // TODO: 持久化此页面
-      console.log("点击了退出按钮")
-  }
+    if (drawandnosave) {
+        // TODO: 持久化此页面
+        console.log("点击了退出按钮")
+    }
 }
 
 // 将图画保存到桌面
@@ -730,4 +739,36 @@ String.prototype.colorHex = function () {
     } else {
         return String(color);
     }
+}
+
+// 更加当前svg的所有元素，设置各个图形的id起始
+// 主要用于加载图形后使用
+function LoadIds() {
+    for (i = 0; i < svg.children.length; i++) {
+        var tag = svg.children[i].nodeName
+        var id = svg.children[i].getAttribute("id")
+        console.log("LoadIds:", tag, id)
+
+        if (tag == 'polyline') {
+            polylineNum = max(polylineNum, parseInt(id))
+        } else if (tag == 'ellipse') {
+
+            ellipseNum = max(ellipseNum, id.split('_')[1])
+        } else if (tag == 'rectangle') {
+            rectangleNum = max(rectangleNum, id.split('_')[1])
+        } else if (tag == 'line') {
+            lineNum = max(lineNum, id.split('_')[1])
+        }
+    }
+    polylineNum ++
+    ellipseNum ++
+    rectangleNum ++
+    lineNum ++
+}
+
+function max(a, b) {
+    if (a > b) {
+        return a
+    }
+    return b
 }

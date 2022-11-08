@@ -39,7 +39,7 @@ func (*pageService) Add(username, pagename string) (string, error) {
 		return "", err
 	}
 	// 为防止用户创建同名
-	if ok := dao.NewPage().QueryPageByName(userid, pagename); ok {
+	if _, ok := dao.NewPage().QueryPageByName(userid, pagename); ok {
 		return "", errors.Wrapf(xerr2.NewErrCode(xerr2.PageExistedErr),
 			"page 已经存在, 不允许再次创建")
 	}
@@ -70,7 +70,7 @@ func (*pageService) Drop(username string, pageIdx int64) (string, error) {
 	return filename, err
 }
 
-func (*pageService) Query(username string) ([][]string, error) {
+func (*pageService) QueryMany(username string) ([][]string, error) {
 	// 首先根据username获取userid
 	userid, _, err := dao.NewUser().Query(username)
 	if err != nil {
@@ -79,4 +79,18 @@ func (*pageService) Query(username string) ([][]string, error) {
 
 	pages, err := dao.NewPage().QueryPages(userid)
 	return pages, err
+}
+
+func (*pageService) QueryOne(username string, pagename string) (string, error) {
+	// 首先根据username获取userid
+	userid, _, err := dao.NewUser().Query(username)
+	if err != nil {
+		return "", err
+	}
+	SvgPath, ok := dao.NewPage().QueryPageByName(userid, pagename)
+	if !ok {
+		return "", errors.Wrapf(xerr2.NewErrCode(xerr2.PageNotExistErr),
+			"page 不存在")
+	}
+	return SvgPath, nil
 }

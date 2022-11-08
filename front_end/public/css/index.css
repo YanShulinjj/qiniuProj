@@ -406,11 +406,19 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
     border-bottom: solid 2px #854ac4;
 }
 
-
-/*.icon-qiniu-list div ul li:hover {*/
-/*    display: block;*/
-/*    position: absolute;*/
-/*    left: 150px;*/
-/*    top: 0;*/
-/*    background-color: green;*/
-/*}*/
+/* ------------------------提示------------------------ */
+.tips {
+    width: 100px;
+    height: 60px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 10px;
+    border: solid 2px rgb(255, 255, 255);
+    background-color: rgb(94 170 255);
+    text-align: center;
+    line-height: 60px;
+    display: none;
+    font-size: 20px;
+    color: white;
+}

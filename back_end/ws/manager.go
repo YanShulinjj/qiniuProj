@@ -46,14 +46,22 @@ func (m *Manager) WriteToAll() {
 			if !ok {
 				log.Printf("[%s]没有取到广播数据。\n", m.PageName)
 			}
+			// 使用多个协程广播消息
+			wg := sync.WaitGroup{}
+			sender, ok := m.ClientMap[data.Id]
 			for _, client := range m.ClientMap {
-				sender, ok := m.ClientMap[data.Id]
-				if !ok || sender.Id != client.Id {
-					client.Lock()
-					client.Conn.WriteMessage(websocket.TextMessage, data.Message)
-					client.Unlock()
-				}
+				wg.Add(1)
+				go func(c *Client) {
+					defer wg.Done()
+					if !ok || sender.Id != c.Id {
+						c.Lock()
+						c.Conn.WriteMessage(websocket.TextMessage, data.Message)
+						c.Unlock()
+					}
+				}(client)
 			}
+			wg.Wait()
+
 			if DEBUG {
 				log.Printf("[%s]广播数据: %v\n", m.PageName, data.Message)
 			}
