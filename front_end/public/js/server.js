@@ -131,7 +131,7 @@ function InitPage() {
         // 服务器返回的数据
         console.log(data)
         if (data.status_code == 0) {
-            var svgpath = data.svg_path
+            var svgpath = "http://"+HostAddr+data.svg_path
             $.ajax({
                 type:"GET",
                 url: svgpath,

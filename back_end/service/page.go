@@ -8,7 +8,6 @@ package service
 
 import (
 	"github.com/pkg/errors"
-	"qiniu/config"
 	"qiniu/dao"
 	"qiniu/pkg/svg"
 	xerr2 "qiniu/pkg/xerr"
@@ -45,7 +44,7 @@ func (*pageService) Add(username, pagename string) (string, error) {
 	}
 	pageIdx += 1
 	// 生成一个svgPath路径
-	svgPath := svg.GenPath(config.C.Host, config.C.Port, username, pagename)
+	svgPath := svg.GenPath(username, pagename)
 	_, err = dao.NewPage().Create(userid, pageIdx, pagename, svgPath)
 	if err != nil {
 		return "", err

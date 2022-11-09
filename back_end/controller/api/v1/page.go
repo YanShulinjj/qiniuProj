@@ -134,7 +134,7 @@ func (*pageController) GetPage(c *gin.Context) {
 	c.JSON(http.StatusOK, response.PageInfo{
 		Page: response.Page{
 			PageName: pagename,
-			SvgPath:  "http://" + path,
+			SvgPath:  path,
 		},
 	})
 }
