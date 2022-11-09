@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"qiniu/config"
 	v1 "qiniu/controller/api/v1"
+	"qiniu/pkg/encryption"
 	"qiniu/service"
 	"qiniu/ws"
-	"strings"
 )
 
 func InitRouter() *gin.Engine {
@@ -28,25 +28,23 @@ func InitRouter() *gin.Engine {
 	r.StaticFS("/data", http.Dir("./data"))
 	r.LoadHTMLFiles("../front_end/index.html")
 	r.GET("/qiniu", func(c *gin.Context) {
-		pageName := c.Query("page")
-		userName := c.DefaultQuery("username", "unnamed")
-		// pageName 必须形如"username_pagename"
-		parts := strings.Split(pageName, "$")
-		if len(parts) != 2 || len(parts[0]) == 0 || len(parts[1]) == 0 {
-			c.JSON(http.StatusOK, gin.H{
-				"status": "请求失败",
-				"msg":    "page format is not correct!~",
-			})
-			return
+		pageName := c.DefaultQuery("page", "1")
+		Ip := c.RemoteIP()
+		userName, _ := encryption.Md5ByString(Ip)
+		authorName := c.Query("author")
+		if len(authorName) == 0 {
+			// 新建一个用户
+			service.NewUser().Add(userName)
+			authorName = userName
 		}
-
 		// 如果页面还未添加
 		service.NewPage().Add(userName, pageName)
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
-			"pageName": pageName,
-			"userName": userName,
-			"hostAddr": config.C.Host + config.C.Port,
+			"pageName":   pageName,
+			"userName":   userName,
+			"authorName": authorName,
+			"hostAddr":   config.C.Host + config.C.Port,
 		})
 	})
 	// TODO

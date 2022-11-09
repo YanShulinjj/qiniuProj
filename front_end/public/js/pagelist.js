@@ -1,4 +1,3 @@
-
 // 通过js添加page部分
 // 获取ul元素
 var ul = document.getElementById("pagelist")

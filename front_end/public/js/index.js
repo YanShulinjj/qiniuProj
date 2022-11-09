@@ -33,6 +33,7 @@ let addPage = document.querySelector('.add')
 let rwMode = document.querySelector('.rwMode')
 let undo = document.querySelector('.undo')
 let redo = document.querySelector('.redo')
+let share = document.querySelector('.share')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -623,16 +624,21 @@ document.addEventListener("keydown", function (event) {
 })
 
 // 下面是退出浏览器提示
-window.onbeforeunload = function () {
+window.onbeforeunload = function (e) {
     if (drawandnosave) {
         // TODO: 持久化此页面
+        e = e || window.event
+        if(e) {
+            e.returnValue = '关闭提示'
+        }
+        alert("页面还没有保存")
         console.log("点击了退出按钮")
     }
 }
 
 // 将图画保存到桌面
 saveFile.addEventListener('click' ,function save(){
-    drawandnosave = false
+    // drawandnosave = false
 
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
@@ -690,6 +696,18 @@ redo.addEventListener("click", function (e) {
         }
         client.send(JSON.stringify(msg))
     }
+})
+
+// 生成链接
+share.addEventListener("click", function (e){
+    console.log("share click")
+    let area = document.createElement("textarea")
+    area.innerHTML = "http://" + HostAddr + "/qiniu?page="+pageName+"&author="+pageAuthorName
+    document.body.appendChild(area)
+    area.select()
+    document.execCommand("Copy")
+    document.body.removeChild(area)
+    var r=confirm("分享链接已经复制到粘贴板上啦");
 })
 
 // TODO rwMode

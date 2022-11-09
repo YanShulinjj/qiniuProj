@@ -51,7 +51,7 @@ func (*pageController) Add(c *gin.Context) {
 }
 
 func (*pageController) PageList(c *gin.Context) {
-	username := c.Query("username")
+	username := c.Query("author")
 
 	pages, err := service.NewPage().QueryMany(username)
 	if err != nil {

@@ -406,6 +406,14 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
     border-bottom: solid 2px #854ac4;
 }
 
+.page-list-open > ul:last-child  {
+    /*display: block;*/
+    border: none;
+}
+
+.page-list-open > ul > li > a {
+    text-decoration: none
+}
 /* ------------------------提示------------------------ */
 .tips {
     width: 100px;
