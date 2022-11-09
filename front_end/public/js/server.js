@@ -78,12 +78,21 @@ function UpdatePageList(pages) {
     console.log("UpdatePageList: ", pages)
     for (i =0; i< pages.length; i++) {
         var li = document.createElement("li")
-        a = document.createElement("a")
+        var a = document.createElement("a")
         a.href = "/qiniu?author="+pageAuthorName+"&page="+pages[i].page_name
         a.innerHTML = pages[i].page_name
+        a.onclick = function (e) {
+            // 多人协作
+            let msg = {
+                type: PageChangeType,
+                Attr: e.target.href,
+            }
+            client.send(JSON.stringify(msg))
+        }
         li.insertBefore(a, null)
         ul.insertBefore(li, ul.lastChild)
     }
+    ul.lastChild.style.borderBottom = "none"
 }
 
 function UploadSVG() {

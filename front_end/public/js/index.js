@@ -66,6 +66,7 @@ const CommonType = 11
 const ModeChangeType = 12
 const NeedSyncType = 13
 const InitializeType = 14
+const PageChangeType = 15
 
 // 记录各种图形的id
 let polylineNum = 1

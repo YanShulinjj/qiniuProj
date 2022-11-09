@@ -13,7 +13,7 @@ const (
 	NeedSyncType   = 13
 )
 
-var DEBUG = true
+var DEBUG = false
 var IPMode = false
 var MaxClientNum = 128
 var MaxMessageNum = 128

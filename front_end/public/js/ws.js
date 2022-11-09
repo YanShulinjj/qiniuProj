@@ -220,6 +220,13 @@ function ws () {
                     document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
                 }
                 break
+            case PageChangeType:
+                // 只在只读下有效果
+                console.log("Page Change Msg!")
+                if (readonly) {
+                    window.location.href = msg.Attr
+                }
+                break
             default:
                 console.log("不支持的消息类型")
         }
