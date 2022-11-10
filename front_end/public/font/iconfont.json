@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "2076191",
+      "name": "分享",
+      "font_class": "qiniu-share",
+      "unicode": "e86e",
+      "unicode_decimal": 59502
+    },
+    {
       "icon_id": "5809149",
       "name": "查看",
       "font_class": "qiniu-watch",

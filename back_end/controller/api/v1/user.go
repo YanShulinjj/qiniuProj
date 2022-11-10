@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"qiniu/controller/api/response"
-	"qiniu/pkg/name"
+	"qiniu/pkg/encryption"
 	"qiniu/pkg/xerr"
 	"qiniu/service"
 )
@@ -24,11 +24,9 @@ func NewUserController() *userController {
 }
 
 func (*userController) Register(c *gin.Context) {
-	username := c.Query("username")
-	if username == "unnamed" {
-		username = name.GetDefaultName()
-	}
-	userId, err := service.NewUser().Add(username)
+	Ip := c.RemoteIP()
+	userName, _ := encryption.Md5ByString(Ip)
+	userId, err := service.NewUser().Add(userName)
 	if err != nil {
 		c.JSON(http.StatusOK, response.Register{
 			Status: response.Status{
@@ -36,13 +34,13 @@ func (*userController) Register(c *gin.Context) {
 				"注册用户出错",
 			},
 			UserID:   userId,
-			UserName: username,
+			UserName: userName,
 		})
 		return
 	}
 	c.JSON(http.StatusOK, response.Register{
 		Status:   response.Status{},
 		UserID:   userId,
-		UserName: username,
+		UserName: userName,
 	})
 }

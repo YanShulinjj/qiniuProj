@@ -1,6 +1,6 @@
 // 客户端与服务端建立websocket链接
 function ws () {
-    client = new WebSocket("ws://"+HostAddr+"/ws/wedraw?username="+userName+"&page="+pageName);    //连接服务器
+    client = new WebSocket("ws://"+HostAddr+"/ws/wedraw?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -220,6 +220,13 @@ function ws () {
                     document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'W')
                 }
                 break
+            case PageChangeType:
+                // 只在只读下有效果
+                console.log("Page Change Msg!")
+                if (readonly) {
+                    window.location.href = msg.Attr
+                }
+                break
             default:
                 console.log("不支持的消息类型")
         }
@@ -235,7 +242,8 @@ function ws () {
 }
 
 function syncws() {
-    syncclient = new WebSocket("ws://"+HostAddr+"/ws/statue?username="+userName+"&page="+pageName);    //连接服务器
+    console.log("SyncWS start... ")
+    syncclient = new WebSocket("ws://"+HostAddr+"/ws/statue?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };

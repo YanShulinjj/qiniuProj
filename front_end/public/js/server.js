@@ -1,10 +1,14 @@
+// 包含所有与后端请求交互的方法
+
 let userId = 0
 let HostAddr = document.getElementById("hostAddr").innerText
-
+let pageAuthorName = document.getElementById("authorName").innerText
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
-let pageAuthorName = pageName.split('$')[0]
+let readonly = document.getElementById("rw").innerText == "1"
 let pages  = []
+
+// let DATA
 
 GetUserInfo()
 
@@ -23,6 +27,7 @@ function AddPage(newPageName) {
             // 更新pagelist
             pages.push(data)
             // 通过js添加page部分
+            console.log("Add page: ", pages)
             UpdatePageList(pages)
         } else {
             alert("添加页面出错，该pagename已经存在！")
@@ -43,14 +48,20 @@ function GetUserInfo() {
         userName = data.user_name
         userId = data.user_id
         console.log(userId)
-        syncws() //
+        InitPage()
         ws ()   // 直接建立websocket连接
         GetPageList()
+        if (readonly) {
+            ishidden = !ishidden
+            console
+            hiddenElems()
+            document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
+        }
     })
 }
 
 function GetPageList() {
-    var url = "http://"+HostAddr+'/backend/page/list?username=' + userName
+    var url = "http://"+HostAddr+'/backend/page/list?author=' + pageAuthorName
     $.ajax({
         type: 'GET',
         url: url,
@@ -66,20 +77,30 @@ function GetPageList() {
     })
 }
 
-
 function UpdatePageList(pages) {
     // 获取ul元素
     var ul = document.getElementById("pagelist")
     // 首先清除ul的child
-    ul.innerHTM = ''
+    ul.innerHTML = ''
+    console.log("UpdatePageList: ", pages)
     for (i =0; i< pages.length; i++) {
         var li = document.createElement("li")
-        a = document.createElement("a")
-        a.href = "/qiniu?username="+userName+"&page="+userName+'$'+ pages[i].page_name
+        var a = document.createElement("a")
+        a.href = "/qiniu?author="+pageAuthorName+"&page="+pages[i].page_name
         a.innerHTML = pages[i].page_name
+        a.onclick = function (e) {
+            // 多人协作
+            var rw = readonly? "1": "0"
+            let msg = {
+                type: PageChangeType,
+                Attr: e.target.href+"&rw="+rw,
+            }
+            client.send(JSON.stringify(msg))
+        }
         li.insertBefore(a, null)
         ul.insertBefore(li, ul.lastChild)
     }
+    ul.lastChild.style.borderBottom = "none"
 }
 
 function UploadSVG() {
@@ -87,6 +108,7 @@ function UploadSVG() {
         console.log("只读模式、禁止修改")
         return
     }
+    drawandnosave = false
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
 
@@ -103,5 +125,42 @@ function UploadSVG() {
     }).done(function (data) {
         // 服务器返回的数据
         console.log(data)
+    })
+}
+
+function InitPage() {
+    var url = "http://"+HostAddr+'/backend/page/get?username='+pageAuthorName+'&pagename='+pageName
+    $.ajax({
+        type: 'GET',
+        url: url,
+        processData: false,
+        contentType: false
+    }).done(function (data) {
+        // 服务器返回的数据
+        console.log(data)
+        if (data.status_code == 0) {
+            var svgpath = "http://"+HostAddr+data.svg_path
+            $.ajax({
+                type:"GET",
+                url: svgpath,
+                success:function(resp, status){
+                    if(status == "success"){
+                        console.log(resp)
+                        svgparent.innerHTML = resp.firstChild.outerHTML
+                        svg = document.querySelector('.svg')
+                        // 设置多个图形的ID
+                        // DATA = data
+                        LoadIds()
+                    }
+                },
+                complete:function(){
+                    console.log("Syncws Reading...")
+                    syncws() //
+                }
+            })
+
+        } else {
+            alert("该页面还未创建！")
+        }
     })
 }

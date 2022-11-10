@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-func GenPath(host, port, username, pagename string) string {
-	return fmt.Sprintf("%s%s/data/svg/%s/%s",
-		host, port, username, pagename)
+func GenPath(username, pagename string) string {
+	return fmt.Sprintf("/data/svg/%s/%s",
+		username, pagename)
 }
 
 func ParseFileName(path string) string {

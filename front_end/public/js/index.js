@@ -33,6 +33,7 @@ let addPage = document.querySelector('.add')
 let rwMode = document.querySelector('.rwMode')
 let undo = document.querySelector('.undo')
 let redo = document.querySelector('.redo')
+let share = document.querySelector('.share')
 let saveFile = document.querySelector('.save')
 let openFile = document.querySelector('.open')
 let fileInput = document.querySelector('#fileInput')
@@ -46,7 +47,7 @@ let isDrawPolygon = false  // 定义当前是否有多边形正在画
 let ishidden = false       // 定义是否隐藏按钮
 let ispagelist = false     // 定义是否点击了pagelist
 let mousedownonelement = false
-let readonly = false
+
 
 
 // type 编号
@@ -65,6 +66,7 @@ const CommonType = 11
 const ModeChangeType = 12
 const NeedSyncType = 13
 const InitializeType = 14
+const PageChangeType = 15
 
 // 记录各种图形的id
 let polylineNum = 1
@@ -79,12 +81,16 @@ let saveFileName = 'xxxx.svg'
 let elementQueue = []
 let queueSize = 0
 let maxSize = 10
-let index = -1
+let index = -1;
 
+// PC 和移动端兼容
+let down = {true: 'mousedown', false: 'touchstart'}
+let move = {true: 'mousemove', false: 'touchmove'}
+let up = {true: 'mouseup', false: 'touchend'}
+let platform = IsPC()
 
 /* -----------------------事件定义区 -------------------------------- */
-
-svgContainer.addEventListener('mousedown', (e) => {
+svgContainer.addEventListener(down[platform], (e) => {
 
     // 如果当前只读模式，并且登录者不是该页面的所有者
     if (readonly && userName != pageAuthorName) {
@@ -93,14 +99,14 @@ svgContainer.addEventListener('mousedown', (e) => {
     }
     //背景色改变
     if (labelFill.contains(e.target)) {
-        svgContainer.addEventListener('mouseup', (fillE) => {
+        svgContainer.addEventListener(up[platform], (fillE) => {
             labelFill.style.backgroundColor = fillColor.value
         })
     }
 
     // 下面是改变input颜色选择器的外面label的颜色也跟着改变
     if (laberColors.contains(e.target)) {    // 这个是修改颜色，把html那个颜色样式也修改
-        svgContainer.addEventListener('mouseup' ,(colosE) => {
+        svgContainer.addEventListener(up[platform] ,(colosE) => {
             laberColors.style.backgroundColor = colorInput.value
         })
 
@@ -108,7 +114,7 @@ svgContainer.addEventListener('mousedown', (e) => {
 
     // 下面是改变滑动条的数字显示
     if (range.contains(e.target)) {     // 修改滑动条的那个文字
-        svgContainer.addEventListener('mousemove', function rangeE () {
+        svgContainer.addEventListener(move[platform], function rangeE () {
             rangeText.textContent = range.lastElementChild.value
         })
     }
@@ -228,11 +234,11 @@ svgContainer.addEventListener('mousedown', (e) => {
                 client.send(JSON.stringify(msg))
             }
 
-            svgContainer.addEventListener('mousemove', drawDot)
-            svgContainer.addEventListener('mouseup',  function onceDot(){
+            svgContainer.addEventListener(move[platform], drawDot)
+            svgContainer.addEventListener(up[platform],  function onceDot(){
 
-                svgContainer.removeEventListener('mouseup', onceDot)
-                svgContainer.removeEventListener('mousemove', drawDot)
+                svgContainer.removeEventListener(up[platform], onceDot)
+                svgContainer.removeEventListener(move[platform], drawDot)
             })
         }
 
@@ -290,9 +296,9 @@ svgContainer.addEventListener('mousedown', (e) => {
                 index ++
             }
 
-            document.addEventListener('mousemove', drawEllipse)   // 持续运行
+            document.addEventListener(move[platform], drawEllipse)   // 持续运行
 
-            document.addEventListener('mouseup', function once() {  // 解绑
+            document.addEventListener(up[platform], function once() {  // 解绑
                 // 多人协作, 发送结束标记
                 let msg = {
                     type: CircleType,
@@ -303,8 +309,8 @@ svgContainer.addEventListener('mousedown', (e) => {
                 }
                 client.send(JSON.stringify(msg))
                 ellipseNum ++
-                document.removeEventListener('mouseup', once)
-                document.removeEventListener('mousemove', drawEllipse)
+                document.removeEventListener(up[platform], once)
+                document.removeEventListener(move[platform], drawEllipse)
             })
         }
         // 矩形和圆角矩形
@@ -389,8 +395,8 @@ svgContainer.addEventListener('mousedown', (e) => {
                 index ++
             }
 
-            svgContainer.addEventListener('mousemove', drawRect)
-            svgContainer.addEventListener('mouseup', function onceRect(){
+            svgContainer.addEventListener(move[platform], drawRect)
+            svgContainer.addEventListener(up[platform], function onceRect(){
                 // 多人协作, 发送结束标记
                 let msg = {
                     type: RetangleType,
@@ -402,8 +408,8 @@ svgContainer.addEventListener('mousedown', (e) => {
                 client.send(JSON.stringify(msg))
                 rectangleNum ++
                 console.log("完成矩形勾画")
-                svgContainer.removeEventListener('mousemove', drawRect)
-                svgContainer.removeEventListener('mouseup', onceRect)
+                svgContainer.removeEventListener(move[platform], drawRect)
+                svgContainer.removeEventListener(up[platform], onceRect)
             })
 
         }
@@ -461,9 +467,9 @@ svgContainer.addEventListener('mousedown', (e) => {
                 index ++
             }
 
-            svgContainer.addEventListener('mousemove', drawLinear)
+            svgContainer.addEventListener(move[platform], drawLinear)
 
-            svgContainer.addEventListener('mouseup', function onceLinear() {
+            svgContainer.addEventListener(up[platform], function onceLinear() {
                 // 多人协作, 发送结束标记
                 let msg = {
                     type: LineType,
@@ -474,13 +480,13 @@ svgContainer.addEventListener('mousedown', (e) => {
                 }
                 client.send(JSON.stringify(msg))
                 lineNum++
-                svgContainer.removeEventListener('mouseup', onceLinear)
-                svgContainer.removeEventListener('mousemove', drawLinear)
+                svgContainer.removeEventListener(up[platform], onceLinear)
+                svgContainer.removeEventListener(move[platform], drawLinear)
             })
         }
         // TODO: 文本
         if (textedit.checked) {
-            var localpoint = window.getlocalmousecoord(svg, e);
+            var localpoint = mousePos(svg);
             if (!mousedownonelement) {
                 createtext(localpoint, svg);
             } else {
@@ -490,24 +496,23 @@ svgContainer.addEventListener('mousedown', (e) => {
 
     }
 })
-
-
 // 点击显示pagelist
 pagelist.addEventListener('click', (e) => {
     //
-    console.log("点击了pagelist")
+    console.log("点击了pagelist", ispagelist)
     ispagelist = !ispagelist
     if (ispagelist)  {
         // 显示pagelist
-        var element = document.getElementsByClassName("page-list-open")[0]
+        var element = document.getElementById("page-list-open")
 
         element.setAttribute("style","margin-top: 10px;display: block;width: " +
             "80px;background-color:rgb(94 170 255);border-radius: 10px;" +
             "border: solid 2px rgb(255, 255, 255);")
     } else {
         // 显示pagelist
-        var element = document.getElementsByClassName("page-list-open")[0]
+        var element = document.getElementById("page-list-open")
         element.setAttribute("style","display: node;")
+        console.log("隐藏pagelist")
         // // 实现hover效果
         // // 为element注册鼠标进入事件
         // element.onmouseover = function () {
@@ -565,6 +570,7 @@ fileInput.addEventListener('change', e => {
         var svgFileContent = fr.result
         svgparent.innerHTML = svgFileContent
         svg = document.querySelector('.svg')
+        LoadIds()
         let msg = {
             type: LoadType,
             Attr: {
@@ -582,7 +588,12 @@ document.addEventListener("keydown", function (event) {
         console.log("只读模式、禁止修改")
         return
     }
-    if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
+    if (event.code == 'KeyS' && event.shiftKey) {
+        // 保存页面
+        UploadSVG()
+        showtips("Save")
+
+    }else if (event.code == "KeyZ" && event.ctrlKey && event.shiftKey) {
         // console.log("redo, ", index, elementQueue.length)
         showtips("Redo")
         if (elementQueue.length > 0 && index < elementQueue.length-1) {
@@ -617,16 +628,21 @@ document.addEventListener("keydown", function (event) {
 })
 
 // 下面是退出浏览器提示
-window.onbeforeunload = function () {
-    if (drawandnosave) {
+window.onbeforeunload = function (e) {
+    if (drawandnosave && !readonly)  {
         // TODO: 持久化此页面
+        e = e || window.event
+        if(e) {
+            e.returnValue = '关闭提示'
+        }
+        alert("页面还没有保存")
         console.log("点击了退出按钮")
     }
 }
 
 // 将图画保存到桌面
 saveFile.addEventListener('click' ,function save(){
-    drawandnosave = false
+    // drawandnosave = false
 
     var svgSource = svg.outerHTML
     var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>', svgSource], { type: "image/xml+svg" })
@@ -686,6 +702,18 @@ redo.addEventListener("click", function (e) {
     }
 })
 
+// 生成链接
+share.addEventListener("click", function (e){
+    console.log("share click")
+    let area = document.createElement("textarea")
+    area.innerHTML = "http://" + HostAddr + "/qiniu?page="+pageName+"&author="+pageAuthorName
+    document.body.appendChild(area)
+    area.select()
+    document.execCommand("Copy")
+    document.body.removeChild(area)
+    var r=confirm("分享链接已经复制到粘贴板上啦");
+})
+
 // TODO rwMode
 rwMode.addEventListener("click", function (e){
     readonly = !readonly
@@ -707,9 +735,17 @@ rwMode.addEventListener("click", function (e){
 function mousePos(node) {
     var box = node.getBoundingClientRect()
 
-    return {
-        x: window.event.clientX - box.x,
-        y: window.event.clientY - box.y,
+    if (platform) {
+        return {
+            x: window.event.clientX - box.x,
+            y: window.event.clientY - box.y,
+        }
+    } else {
+        console.log("mousePos: ", window.event)
+        return {
+            x: window.event.changedTouches[0].pageX - box.x,
+            y: window.event.changedTouches[0].pageY - box.y,
+        }
     }
 }
 
@@ -733,4 +769,55 @@ String.prototype.colorHex = function () {
     } else {
         return String(color);
     }
+}
+
+
+// 判断是否是pc设备
+function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone","SymbianOS", "Windows Phone", "iPod"];
+    var flag = true;
+    console.log("Agent: ", userAgentInfo)
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    console.log("ISPC()", flag)
+    return flag;
+}
+
+
+
+// 更加当前svg的所有元素，设置各个图形的id起始
+// 主要用于加载图形后使用
+function LoadIds() {
+    for (i = 0; i < svg.children.length; i++) {
+        var tag = svg.children[i].nodeName
+        var id = svg.children[i].getAttribute("id")
+        console.log("LoadIds:", tag, id)
+
+        if (tag == 'polyline') {
+            polylineNum = max(polylineNum, parseInt(id))
+        } else if (tag == 'ellipse') {
+
+            ellipseNum = max(ellipseNum, id.split('_')[1])
+        } else if (tag == 'rectangle') {
+            rectangleNum = max(rectangleNum, id.split('_')[1])
+        } else if (tag == 'line') {
+            lineNum = max(lineNum, id.split('_')[1])
+        }
+    }
+    polylineNum ++
+    ellipseNum ++
+    rectangleNum ++
+    lineNum ++
+}
+
+function max(a, b) {
+    if (a > b) {
+        return a
+    }
+    return b
 }

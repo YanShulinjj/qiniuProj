@@ -33,3 +33,7 @@ type PageList struct {
 	Status
 	Items []*Page `json:"list"`
 }
+type PageInfo struct {
+	Status
+	Page
+}

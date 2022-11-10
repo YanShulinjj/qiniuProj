@@ -19,20 +19,23 @@ var seq int64
 
 // gin 处理 websocket handler
 func WSHandler(c *gin.Context) {
-	username := c.Query("username")
+	userName := c.Query("username")
+	authorName := c.Query("author")
 	pageName := c.Query("page")
 
 	// 根据pageName 获取指定manager
-	m, ok := defaultMangerGroup.Get(pageName)
+	key := authorName + "#" + pageName
+	m, ok := defaultMangerGroup.Get(key)
+
 	if !ok {
 		// 第一次进入该页面的为所有者
-		m = NewManager(pageName, username)
+		m = NewManager(key, authorName)
 		// 启动m
 		go m.Start()
-		defaultMangerGroup.Put(pageName, m)
+		defaultMangerGroup.Put(key, m)
 	}
 	// 如果username的客户端已经连接, 拒绝本次连接
-	if m.IsExist(username) {
+	if m.IsExist(userName) {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"status_code": xerr.ClientExistedErr,
 		})
@@ -49,18 +52,18 @@ func WSHandler(c *gin.Context) {
 
 	// 设置http头部，添加sessionid
 	heq := make(http.Header)
-	heq.Set("sessionid", username)
+	heq.Set("sessionid", userName)
 
 	// 建立一个websocket的连接
 	conn, err := upGrader.Upgrade(c.Writer, c.Request, heq)
 	if err != nil {
-		log.Printf("websocket connect error: %s", username)
+		log.Printf("websocket connect error: %s", userName)
 		return
 	}
 
 	// 创建一个client对象（包装websocket连接）
 	client := &Client{
-		Id:   username,
+		Id:   userName,
 		Conn: conn,
 	}
 
@@ -72,16 +75,18 @@ func WSHandler(c *gin.Context) {
 // 同步数据的ws连接
 func SyncHandler(c *gin.Context) {
 	username := c.Query("username")
+	authorName := c.Query("author")
 	pageName := c.Query("page")
 
 	// 根据pageName 获取指定manager
-	m, ok := syncMangerGroup.Get(pageName)
+	key := authorName + "#" + pageName
+	m, ok := syncMangerGroup.Get(key)
 	if !ok {
 		// 第一次进入该页面的为所有者
-		m = NewManager(pageName, username)
+		m = NewManager(key, authorName)
 		// 启动m
 		go m.Start()
-		syncMangerGroup.Put(pageName, m)
+		syncMangerGroup.Put(key, m)
 	}
 	// 如果username的客户端已经连接, 拒绝本次连接
 	if m.IsExist(username) {

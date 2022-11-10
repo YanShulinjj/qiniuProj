@@ -1,6 +1,6 @@
 Name: qiniu-api
-Host: 192.168.137.1
-Port: :8080
+Host: 0.0.0.0
+Port: :9999
 Mode: dev
 SVGPATH: ./data/svg
 Mysql:

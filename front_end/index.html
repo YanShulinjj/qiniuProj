@@ -13,8 +13,10 @@
 </head>
 <body>
     <p id = "hostAddr" style="display: none">{{.hostAddr}}</p>
+    <p id = "authorName" style="display: none">{{.authorName}}</p>
     <p id = "pageName" style="display: none">{{.pageName}}</p>
     <p id = "userName" style="display: none">{{.userName}}</p>
+    <p id = "rw" style="display: none">{{.rwMode}}</p>
     <div class="svgContainer">
         <!-- 画板部分 -->
         <section class="toolContainer ">
@@ -67,7 +69,7 @@
             <div class="addundobar">
 
                 <label class ="iconfont hiddenbutton icon-qiniu-list">
-                    <div class="page-list-open">
+                    <div id = "page-list-open" class="page-list-open">
                         <ul id="pagelist">
                         </ul>
                     </div>
@@ -98,6 +100,9 @@
                     <button class="rwMode"></button>
                 </label>
 
+                <label class="iconfont hiddenbutton icon-qiniu-share">
+                    <button class="share"></button>
+                </label>
 
                 <label  class="iconfont hiddenbutton icon-qiniu-redo">
                     <button class="redo"></button>
