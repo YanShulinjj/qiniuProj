@@ -2,9 +2,11 @@
 
 let userId = 0
 let HostAddr = document.getElementById("hostAddr").innerText
+let wsAddr = document.getElementById("wsAddr").innerText
 let pageAuthorName = document.getElementById("authorName").innerText
 let userName = document.getElementById("userName").innerText
 let pageName = document.getElementById("pageName").innerText
+let readonly = document.getElementById("rw").innerText == "1"
 let pages  = []
 
 // let DATA
@@ -83,9 +85,10 @@ function UpdatePageList(pages) {
         a.innerHTML = pages[i].page_name
         a.onclick = function (e) {
             // 多人协作
+            var rw = readonly? "1": "0"
             let msg = {
                 type: PageChangeType,
-                Attr: e.target.href,
+                Attr: e.target.href+"&rw="+rw,
             }
             client.send(JSON.stringify(msg))
         }

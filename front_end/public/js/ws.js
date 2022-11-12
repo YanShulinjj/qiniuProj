@@ -1,6 +1,6 @@
 // 客户端与服务端建立websocket链接
 function ws () {
-    client = new WebSocket("ws://"+HostAddr+"/ws/wedraw?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
+    client = new WebSocket("ws://"+wsAddr+"/ws/wedraw?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -243,7 +243,7 @@ function ws () {
 
 function syncws() {
     console.log("SyncWS start... ")
-    syncclient = new WebSocket("ws://"+HostAddr+"/ws/statue?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
+    syncclient = new WebSocket("ws://"+wsAddr+"/ws/statue?username="+userName+"&page="+pageName+"&author="+pageAuthorName);    //连接服务器
     // client.onopen = function(e){
     //     alert('连接服务器成功！');
     // };
@@ -267,6 +267,14 @@ function syncws() {
             }
             console.log("Queue:", elementQueue)
 
+            // 同步读写模式
+            readonly = msg.Attr.readonly
+            if (readonly) {
+                ishidden = true
+                hiddenElems()
+                document.getElementsByClassName('icon-qiniu-readonly')[0].setAttribute('data-before', 'R')
+            }
+
             // 如果不是作者，关闭连接
             if (pageAuthorName != userName) {
                 syncclient.close()
@@ -285,7 +293,8 @@ function syncMsg() {
         let syncmsg = {
             type: InitializeType,
             Attr: {
-                content: svg.innerHTML
+                content: svg.innerHTML,
+                readonly: readonly,
             }
         }
         console.log("send syncmsg")

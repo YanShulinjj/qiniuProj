@@ -11,17 +11,20 @@ import "sync"
 type Server struct {
 	sync.RWMutex
 	host    string
-	port    string
 	pageNum int
 	isAlive bool
 	QPS     float64
 }
 
-func NewServer(host string, port string) *Server {
+func NewServer(host string) *Server {
 	return &Server{
-		host: host,
-		port: port,
+		host:    host,
+		isAlive: true,
 	}
+}
+
+func (s *Server) GetHost() string {
+	return s.host
 }
 
 func (s *Server) Add() {

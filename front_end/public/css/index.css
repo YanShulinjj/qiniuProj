@@ -392,14 +392,14 @@ div.save-open-clear .save:hover, div.save-open-clear .open:hover ,div.save-open-
     display: none;
 }
 
-.icon-qiniu-list:hover .page-list-open{
-    margin-top: 10px;
-    display: block;
-    width: 80px;
-    background-color: rgb(94 170 255);
-    border-radius: 10px;
-    border: solid 2px rgb(255, 255, 255);
-}
+/*.icon-qiniu-list:hover .page-list-open{*/
+/*    margin-top: 10px;*/
+/*    display: block;*/
+/*    width: 80px;*/
+/*    background-color: rgb(94 170 255);*/
+/*    border-radius: 10px;*/
+/*    border: solid 2px rgb(255, 255, 255);*/
+/*}*/
 
 .page-list-open > ul > li {
     /*display: block;*/

@@ -12,7 +12,8 @@ import (
 	v1 "qiniu/controller/api/v1"
 	"qiniu/pkg/encryption"
 	"qiniu/service"
-	"qiniu/ws"
+	"qiniu/splitter"
+	"strings"
 )
 
 func InitRouter() *gin.Engine {
@@ -28,6 +29,7 @@ func InitRouter() *gin.Engine {
 	r.LoadHTMLFiles("../front_end/index.html")
 	r.GET("/qiniu", func(c *gin.Context) {
 		pageName := c.DefaultQuery("page", "1")
+		rwMode := c.DefaultQuery("rw", "0")
 		Ip := c.RemoteIP()
 		userName, _ := encryption.Md5ByString(Ip)
 		authorName := c.Query("author")
@@ -37,13 +39,28 @@ func InitRouter() *gin.Engine {
 			authorName = userName
 		}
 		// 如果页面还未添加
-		service.NewPage().Add(userName, pageName)
+		service.NewPage().Add(authorName, pageName)
+
+		// 分配一个ws服务器给当前页面
+		wsHost, err := splitter.Allocate(authorName)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "faild",
+				"msg":    "获取ws服务器失败," + err.Error(),
+			})
+		}
+		// 因为单机测试使用 多个端口模拟多个ws服务器
+
+		ip := strings.Split(c.Request.Host, ":")[0]
+		port := strings.Split(wsHost, ":")[1]
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"pageName":   pageName,
 			"userName":   userName,
 			"authorName": authorName,
 			"hostAddr":   c.Request.Host,
+			"wsAddr":     ip + ":" + port,
+			"rwMode":     rwMode,
 		})
 	})
 	// TODO
@@ -55,12 +72,6 @@ func InitRouter() *gin.Engine {
 		backend.POST("/page/upload", v1.PageController.UploadSVG)
 		backend.GET("/user/add", v1.UserController.Register)
 
-	}
-
-	wsGroup := r.Group("/ws")
-	{
-		wsGroup.GET("/wedraw", ws.WSHandler) // 每一个访问都会调用该路由对应的方法
-		wsGroup.GET("/statue", ws.SyncHandler)
 	}
 
 	return r

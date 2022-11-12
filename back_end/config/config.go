@@ -12,6 +12,9 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 )
 
+type WsServerConfig struct {
+	Host string
+}
 type Config struct {
 	Mysql struct {
 		DataSource string
@@ -20,6 +23,7 @@ type Config struct {
 	Host       string
 	Port       string
 	SVGPATH    string
+	Servers    []WsServerConfig
 }
 
 var C Config
