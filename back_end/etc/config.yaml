@@ -1,6 +1,6 @@
 Name: qiniu-api
 Host: 0.0.0.0
-Port: :8080
+Port: :9999
 Mode: dev
 SVGPATH: ./data/svg
 Mysql:
@@ -11,6 +11,6 @@ CacheRedis:
     Type: node
     Pass:
 Servers:
-  - Host: 0.0.0.0:9001
-  - Host: 0.0.0.0:9002
-  - Host: 0.0.0.0:9003
+  - Host: 0.0.0.0:9004
+  - Host: 0.0.0.0:9005
+  - Host: 0.0.0.0:9006
